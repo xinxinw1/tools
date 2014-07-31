@@ -1,0 +1,11 @@
+Tools 3.1 - Mar 11, 2014 14:26
+
+- added iso, dyn
+- removed coerce, testfn
+- lpos -> posl
+- fixed err("has1", ...) bug
+- added beg, end
+- moved list functions to L closure
+- removed errfn
+- added speed
+- exported rgxp (forgot before)

@@ -1,0 +1,4 @@
+Tools 1.0 - Jul 29, 2013 19:36
+
+- separated $(id) into tools.js
+- added $.addAttributes

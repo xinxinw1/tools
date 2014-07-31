@@ -1,0 +1,6 @@
+Tools 1.2 - Sep 4, 2013 12:11
+
+- added functins isArgs, isFunc, isFalse, getParams, getFuncName
+- removed extra String(a) in toStr
+- toStr now outputs arguments objects like arrays
+- renamed id to a in $()
