@@ -7,6 +7,8 @@
 3. Add `<script src="tools.js"></script>` to your html file.
 4. Run `$.al("Hello World! | Array: $1 | String: $2 | Object: $3", [1, 2, 3], "hey", {a: 3, b: "test", c: [3, 4, 5]});` to make sure it works.
 
+See http://xinxinw1.github.io/tools/ for an example.
+
 ## Function reference
 
 Coming soon!
