@@ -6,7 +6,12 @@
   if (!nodep){
     var win = window;
     var doc = win.document;
+    var Node = win.Node;
+    var Window = win.Window;
+    var fs = {};
   } else {
+    var win = {};
+    var doc = {};
     var Node = function (){};
     var Window = function (){};
     var fs = require('fs');
