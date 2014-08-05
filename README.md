@@ -16,7 +16,7 @@ See http://xinxinw1.github.io/tools/ for an example.
 1. Go to https://github.com/xinxinw1/tools/releases and download the zip of the latest release.
 2. Extract `tools.js` to your project directory.
 3. Run `$ = require("./tools.js")` in node
-4. Run `$.al("Hello World! | Array: $1 | String: $2 | Object: $3", [1, 2, 3], "hey", {a: 3, b: "test", c: [3, 4, 5]});` to make sure it works.
+4. Run `$.prn("Hello World! | Array: $1 | String: $2 | Object: $3", [1, 2, 3], "hey", {a: 3, b: "test", c: [3, 4, 5]});` to make sure it works.
 
 ## Function reference
 
