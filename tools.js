@@ -1,5 +1,6 @@
-/***** Tools 4.0 *****/
+/***** Tools Devel *****/
 
+//var calls = {pos: [], rpl: [], stf: [], apl: []};
 (function (win, udf){
   var doc = win.document;
   var inf = Infinity;
@@ -42,11 +43,28 @@
     return cls(a) === "[object Number]";
   }
   
+  /*function strp(a){
+    return cls(a) === "[object String]";
+  }*/
+  
   function strp(a){
     return typeof a === "string";
   }
   
+  /*function arrp(a){
+    return cls(a) === "[object Array]" || irrp(a);
+  }
+  
+  // immutable array
+  function irrp(a){
+    return inp(cls(a), "[object Arguments]",
+                       "[object HTMLCollection]",
+                       "[object NodeList]",
+                       "[object NamedNodeMap]",
+                       "[object MozNamedAttrMap]");
+  }*/
   function arrp(a){
+    //calls.arrp.push(arguments.callee.caller);
     var c = Object.prototype.toString.call(a);
     return c === "[object Array]" ||
            c === "[object Arguments]" ||
@@ -72,6 +90,11 @@
   function objp(a){
     return cls(a) === "[object Object]";
   }
+  
+  /*function rgxp(a){
+    calls.rgxp.push(arguments.callee.caller);
+    return cls(a) === "[object RegExp]";
+  }*/
   
   function rgxp(a){
     return a instanceof RegExp;
@@ -110,6 +133,7 @@
   }
   
   function udfp(a){
+    //calls.udfp.push(arguments.callee.caller);
     return a === udf;
   }
   
@@ -388,6 +412,7 @@
   //// Apply ////
   
   function apl(f, a){
+    //calls.apl.push(arguments.callee.caller);
     return f.apply(this, a);
   }
   
@@ -412,6 +437,7 @@
   // mapapp(x, a)
   
   function pos(x, a, n){
+    //calls.pos.push(arguments.callee.caller);
     if (udfp(n))n = 0;
     if (arrp(a)){
       var f = tfn(x);
@@ -519,6 +545,7 @@
   }
   
   function has(x, a){
+    //calls.has.push(arguments.callee.caller);
     if (strp(a)){
       if (strp(x) || arrp(x) || rgxp(x))return pos(x, a) != -1;
       err(has, "Can't find if str a = $1 has x = $2", a, x);
@@ -664,6 +691,7 @@
   }
   
   function rpl(x, y, a){
+    //calls.rpl.push(arguments.callee.caller);
     if (strp(a)){
       // a.replace(x, y) only replaces first occurrence!
       if (strp(x)){
@@ -759,6 +787,7 @@
   //// Whole ////
   
   function len(a){
+    //calls.len.push(arguments.callee.caller);
     if (arrp(a) || strp(a) || fnp(a))return a.length;
     if (objp(a)){
       var n = 0;
@@ -770,6 +799,29 @@
     if (htmp(a))return len(kids(a));
     err(len, "Can't get len of a = $1", a);
   }
+  
+  /*function len(a){
+    try {
+      return a.length;
+    } catch (e){
+      if (objp(a)){
+        var n = 0;
+        for (var k in a){
+          if (a.hasOwnProperty(k))n++;
+        }
+        return n;
+      }
+      if (htmp(a))return len(kids(a));
+      err(len, "Can't get len of a = $1", a);
+    }
+  }*/
+  
+  /*function emp(a){
+    if (arrp(a) || strp(a) || fnp(a) || objp(a))return len(a) == 0;
+    if (nulp(a) || udfp(a))return true;
+    if (htmp(a))return !a.hasChildNodes();
+    err(emp, "Can't find if a = $1 is empty", a);
+  }*/
   
   function emp(a){
     if (arrp(a) || strp(a) || fnp(a))return a.length === 0;
@@ -991,6 +1043,7 @@
   //// Fold / Reduce ////
   
   function fold(f, x, a){
+    //calls.fold.push(arguments.callee.caller);
     if (arguments.length >= 3){
       if (arrp(a)){
         var s = x;
@@ -1427,6 +1480,15 @@
     return udf;
   }
   
+  /*function oref(a, x){
+    if (a === udf)return udf;
+    if (a[x] === udf){
+      if (a[0] === udf)return oref(a[1], x);
+      return oref(a[0], x);
+    }
+    return a[x];
+  }*/
+  
   function oset(a, x, y, top){
     if (top === udf)top = a;
     if (inp(x, 0, 1, "0", "1"))err(oset, "Can't set x = $1", x)
@@ -1434,6 +1496,13 @@
     if (ohas(a, 0))return oset(a[0], x, y, top);
     return oput(top, x, y);
   }
+  
+  /*function oset(a, x, y, top){
+    if (top === udf)top = a;
+    if (a === udf)return oput(top, x, y);
+    if (a[x] === udf)return oset(a[0], x, y, top);
+    return oput(a, x, y);
+  }*/
   
   function osetp(a, x){
     return oref(a, x) !== udf;
@@ -1463,6 +1532,7 @@
   }
   
   function stf(a){ // string fill
+    //calls.stf.push(arguments.callee.caller);
     if (len(arguments) == 0)return "";
     if (strp(a))return foldi(function (s, x, i){
       return rpl("$" + i, dsp(x), s);
@@ -1774,6 +1844,17 @@
   
   ////// Debug //////
   
+  /*
+  function cnts(a){
+    var r = []; var p;
+    for (var i = 0; i < len(a); i++){
+      p = pos(function (x){return x[0] == a[i];}, r);
+      if (p == -1)r.push([a[i], 1]);
+      else r[p][1]++;
+    }
+    return r;
+  }*/
+  
   // cnts([1, 2, 1, 3, 4, 5, 5, 6])
   // -> [[1, 2], [2, 1], [3, 1], [4, 1], [5, 2], [6, 1]]
   function cnts(a){
@@ -2045,6 +2126,51 @@
   
   ////// Testing //////
   
+  /*var a = [2, 3];
+  var b = {a: 3, b: 4, c: 5};
+  b["c"] = b;
+  a[2] = b;
+  a[1] = a;
+  var c = [1, b, a];
+  c[3] = c;*/
+  
+  /*var a = {a: 2, b: 3, c: 4, d: 5, e: 6};
+  var b = cpy(a);
+  a.a = 3;
+  b.e = 10;*/
+  
+  /*var a = {a: 1, b: 2, c: 3};
+  var b = {a: 1, b: 2, c: 3, d: a, e: 5};
+  var c = cpy(b);
+  var d = cln(b);
+  alr(dsp(b));
+  b.a = 5;
+  a.c = 10;
+  alr(dsp(c));
+  alr(dsp(d));*/
+  
+  /*var a = [1, 2, 3, 4, 5];
+  alr(dsp(psh(10, a)));
+  alr(dsp(a));
+  alr(dsp(pop(a)));
+  alr(dsp(a));*/
+  
+  //alr(dsp(rpl("10", "hey", "$1 $1 $10 $0 10")));
+  //paus(3000);
+  //err(err, 'This is a really weird error! $1 $2', stf, [1, 2, 3]);
+  
+  /*function test(){
+    evals("var a = 5;");
+    evl("var b = 6;");
+  }
+  
+  test();
+  //alr(dsp(a));
+  alr(dsp(b));*/
+  
+  //al("test: $1 | b: $2", "bwejiowej", {a: 1, b: 2, c: 3});
+  
+  //al(cal(txt, "div"));
   
   
 })(window);
