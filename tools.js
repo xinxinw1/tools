@@ -173,7 +173,7 @@
   
   ////// Dynamic vars //////
   
-  function dyn(a, x, f){
+  function sta(a, x, f){
     L.psh(x, a);
     var r = f();
     L.pop(a);
@@ -184,7 +184,7 @@
   
   var ds = [];
   function dsp(a){
-    return dyn(ds, a, function (){
+    return sta(ds, a, function (){
       return dsp1(a);
     });
   }
@@ -264,8 +264,8 @@
     return Number(a);
   }
   
-  function tint(a){
-    return parseInt(a);
+  function tint(a, rdx){
+    return parseInt(a, udfp(rdx)?10:rdx);
   }
   
   function tflt(a){
@@ -629,7 +629,7 @@
   
   // remdup(x, a)
   
-  function remb(x, a){
+  function remf(x, a){
     if (arrp(a)){
       var f = tfn(x);
       for (var i = 0; i < len(a); i++){
@@ -665,7 +665,7 @@
         return "";
       }
     }
-    err(remb, "Can't rem x = $1 from the beginning of a = $2", x, a);
+    err(remf, "Can't rem x = $1 from the beginning of a = $2", x, a);
   }
   
   function rpl(x, y, a){
@@ -760,6 +760,8 @@
   
   // fstf(f, a) == mat(f, a)
   // lasf(f, a)
+  
+  // cnt(x, a)
   
   //// Whole ////
   
@@ -1345,7 +1347,7 @@
     err(att, "Can't attach x = $1 to a = $2", x, a);
   }
   
-  ////// Object and Alist //////
+  ////// Object and alist //////
   
   function keys(a){
     if (arrp(a))return map(function (x){
@@ -1731,6 +1733,7 @@
     return spl(rea(a), /\n\r|\n|\r/g);
   }
   
+  // todo: wri(["a", "b", "c"], a)
   function wri(x, a){
     return fs.writeFileSync(a, x);
   }
@@ -1851,8 +1854,16 @@
   
   ////// Other //////
   
+  function rnd(mn, mx){
+    return Math.floor(Math.random()*(mx-mn+1))+mn;
+  }
+  
   function do1(){
     return arguments[0];
+  }
+  
+  function exit(){
+    return process.exit();
   }
   
   ////// Object exposure //////
@@ -1888,7 +1899,7 @@
     iso: iso,
     inp: inp,
     
-    dyn: dyn,
+    sta: sta,
     
     dsp: dsp,
     dstr: dstr,
@@ -1927,7 +1938,7 @@
     all: all,
     keep: keep,
     rem: rem,
-    remb: remb,
+    remf: remf,
     rpl: rpl,
     mat: mat,
     mats: mats,
@@ -2057,7 +2068,9 @@
     gefn: gefn,
     sefn: sefn,
     
-    do1: do1
+    rnd: rnd,
+    do1: do1,
+    exit: exit
   }, $);
   
   if (nodep)module.exports = $;
