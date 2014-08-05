@@ -257,4 +257,6 @@ err(f, a, ...x)   returns an error formatted with stf(a, ...x)
 ### Other
 
 rnd(min, max)     random number from min to max inclusive
+do1(...a)         return the 1st argument after running the rest
+exit()            exit Node.js
 ```
