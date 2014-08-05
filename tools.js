@@ -1,5 +1,8 @@
 /***** Tools Devel *****/
 
+//var calls = {pos: [], rpl: [], stf: [], apl: []};
+//calls.pos.push(arguments.callee.caller);
+//cnts(calls);
 (function (udf){
   var nodep = typeof window === "undefined";
   
@@ -1731,7 +1734,7 @@
     return spl(rea(a), /\n\r|\n|\r/g);
   }
   
-  function wri(a, x){
+  function wri(x, a){
     return fs.writeFileSync(a, x);
   }
   
@@ -1858,8 +1861,8 @@
   ////// Object exposure //////
   
   att({
-    win: win,
     udf: udf,
+    win: win,
     doc: doc,
     inf: inf,
     
