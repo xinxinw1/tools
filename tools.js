@@ -346,8 +346,6 @@
     err(htm, "Can't coerce a = $1 to htm", a);
   }
   
-  ////// Add //////
-  
   ////// Sequence //////
   
   //// Items ////
