@@ -1,8 +1,5 @@
-/***** Tools Devel *****/
+/***** Tools 4.1.0 *****/
 
-//var calls = {pos: [], rpl: [], stf: [], apl: []};
-//calls.pos.push(arguments.callee.caller);
-//cnts(calls);
 (function (udf){
   var nodep = typeof window === "undefined";
   
@@ -2068,51 +2065,6 @@
   
   ////// Testing //////
   
-  /*var a = [2, 3];
-  var b = {a: 3, b: 4, c: 5};
-  b["c"] = b;
-  a[2] = b;
-  a[1] = a;
-  var c = [1, b, a];
-  c[3] = c;*/
-  
-  /*var a = {a: 2, b: 3, c: 4, d: 5, e: 6};
-  var b = cpy(a);
-  a.a = 3;
-  b.e = 10;*/
-  
-  /*var a = {a: 1, b: 2, c: 3};
-  var b = {a: 1, b: 2, c: 3, d: a, e: 5};
-  var c = cpy(b);
-  var d = cln(b);
-  alr(dsp(b));
-  b.a = 5;
-  a.c = 10;
-  alr(dsp(c));
-  alr(dsp(d));*/
-  
-  /*var a = [1, 2, 3, 4, 5];
-  alr(dsp(psh(10, a)));
-  alr(dsp(a));
-  alr(dsp(pop(a)));
-  alr(dsp(a));*/
-  
-  //alr(dsp(rpl("10", "hey", "$1 $1 $10 $0 10")));
-  //paus(3000);
-  //err(err, 'This is a really weird error! $1 $2', stf, [1, 2, 3]);
-  
-  /*function test(){
-    evals("var a = 5;");
-    evl("var b = 6;");
-  }
-  
-  test();
-  //alr(dsp(a));
-  alr(dsp(b));*/
-  
-  //al("test: $1 | b: $2", "bwejiowej", {a: 1, b: 2, c: 3});
-  
-  //al(cal(txt, "div"));
   
   
 })();
