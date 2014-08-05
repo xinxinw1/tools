@@ -1,8 +1,17 @@
 /***** Tools Devel *****/
 
 (function (udf){
-  var win = window;
-  var doc = win.document;
+  var nodep = typeof window === "undefined";
+  
+  if (!nodep){
+    var win = window;
+    var doc = win.document;
+  } else {
+    var Node = function (){};
+    var Window = function (){};
+    var fs = require('fs');
+  }
+  
   var inf = Infinity;
   
   ////// Type //////
@@ -1612,6 +1621,8 @@
   
   ////// DOM //////
   
+  /* Note: these functions won't work in Node.js */
+  
   function $(a){
     return doc.getElementById(a);
   }
@@ -1701,6 +1712,22 @@
   function seth(a, x){
     a.innerHTML = x;
     return a;
+  }
+  
+  ////// File //////
+  
+  /* Note: these functions only work in Node.js */
+  
+  function rea(a){
+    return fs.readFileSync(a, {encoding: "utf8"});
+  }
+  
+  function lns(a){
+    return spl(rea(a), /\n\r|\n|\r/g);
+  }
+  
+  function wri(a, x){
+    return fs.writeFileSync(a, x);
   }
   
   ////// Regex //////
@@ -1823,16 +1850,9 @@
     return arguments[0];
   }
   
-  // global evals
-  function evl(a){
-    (win.execScript || function (a){
-      win["evals"].call(win, a);
-    })(a);
-  }
-  
   ////// Object exposure //////
   
-  win.$ = att({
+  att({
     win: win,
     udf: udf,
     doc: doc,
@@ -1870,11 +1890,9 @@
     dobj: dobj,
     dmp: dmp,
     
-    ou: ou,
     out: out,
-    alr: alr,
-    pr: pr,
     prn: prn,
+    alr: alr,
     al: al,
     
     num: num,
@@ -2011,6 +2029,10 @@
     atth: atth,
     seth: seth,
     
+    rea: rea,
+    lns: lns,
+    wri: wri,
+    
     cap: cap,
     caps: caps,
     
@@ -2030,9 +2052,11 @@
     gefn: gefn,
     sefn: sefn,
     
-    do1: do1,
-    evl: evl,
+    do1: do1
   }, $);
+  
+  if (nodep)module.exports = $;
+  else win.$ = $;
   
   ////// Testing //////
   
