@@ -1,4 +1,4 @@
-/***** Tools 4.3.0 *****/
+/***** Tools 4.4.0 *****/
 
 (function (udf){
   var nodep = typeof window === "undefined";
@@ -258,11 +258,11 @@
     alr(apl(stf, arguments));
   }
   
-  function wr(a){
+  function echo(a){
     doc.write(a);
   }
   
-  function wri(a){
+  function echol(a){
     doc.writeln(a);
   }
   
@@ -1919,8 +1919,8 @@
     prn: prn,
     alr: alr,
     al: al,
-    wr: wr,
-    wri: wri,
+    echo: echo,
+    echol: echol,
     
     num: num,
     tint: tint,
