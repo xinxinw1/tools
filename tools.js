@@ -1,4 +1,4 @@
-/***** Tools 4.2.0 *****/
+/***** Tools 4.3.0 *****/
 
 (function (udf){
   var nodep = typeof window === "undefined";
@@ -262,8 +262,8 @@
     doc.write(a);
   }
   
-  function wri(){
-    wr(apl(stf, arguments));
+  function wri(a){
+    doc.writeln(a);
   }
   
   ////// Converters //////

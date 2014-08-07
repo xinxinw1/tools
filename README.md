@@ -75,7 +75,7 @@ prn(a, ...args)   out(apl(stf, arguments)); (see below for apl and stf)
 alr(a)            win.alert(a);
 al(a, ...args)    alr(apl(stf, arguments));
 wr(a)             doc.write(a)
-wri(a)            wr(apl(stf, arguments));
+wri(a)            doc.writeln(a)
 
 ### Converters
 
