@@ -1,4 +1,4 @@
-/***** Tools 4.4.0 *****/
+/***** Tools 4.4.1 *****/
 
 (function (udf){
   var nodep = typeof window === "undefined";
@@ -243,6 +243,7 @@
   ////// Output //////
   
   function out(a){
+    if (udfp(a))a = "";
     console.log(a);
   }
   
@@ -251,6 +252,7 @@
   }
   
   function alr(a){
+    if (udfp(a))a = "";
     win.alert(a);
   }
   
@@ -259,10 +261,12 @@
   }
   
   function echo(a){
+    if (udfp(a))a = "";
     doc.write(a);
   }
   
   function echol(a){
+    if (udfp(a))a = "";
     doc.writeln(a);
   }
   
