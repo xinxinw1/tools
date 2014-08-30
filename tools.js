@@ -426,6 +426,26 @@
     err(map, "Can't map x = $1 over a = $2", x, a);
   }
   
+  function map(x, a){
+    // (fold #[psh (f %2) %1] [] a)
+    if (arrp(a)){
+      var f = tfn(x);
+      var r = [];
+      for (var i = 0; i < a.length; i++){
+        r.push(f(a[i]));
+      }
+      return r;
+    }
+    if (objp(a)){
+      var f = tfn(x);
+      return foldi(function (o, a, i){
+        o[i] = f(a);
+        return o;
+      }, {}, a);
+    }
+    err(map, "Can't map x = $1 over a = $2", x, a);
+  }
+  
   // mapapp(x, a)
   
   function pos(x, a, n){
@@ -623,10 +643,15 @@
   function rem(x, a){
     if (arrp(a)){
       var f = tfn(x);
-      return fold(function (r, i){
+      var r = [];
+      for (var i = 0; i < a.length; i++){
+        if (!f(a[i]))psh(a[i], r);
+      }
+      return r;
+      /*return fold(function (r, i){
         if (f(i))return r;
         return psh(i, r);
-      }, [], a);
+      }, [], a);*/
     }
     if (strp(a))return rpl(x, "", a);
     if (objp(a)){
@@ -1311,24 +1336,24 @@
   //// Array ////
   
   function psh(x, a){
-    if (irrp(a))err(psh, "Can't psh x = $1 onto uarr a = $2", x, a);
+    //if (irrp(a))err(psh, "Can't psh x = $1 onto uarr a = $2", x, a);
     a.push(x);
     return a;
   }
   
   function pop(a){
-    if (irrp(a))err(pop, "Can't pop from uarr a = $1", a);
+    //if (irrp(a))err(pop, "Can't pop from uarr a = $1", a);
     return a.pop();
   }
   
   function ush(x, a){
-    if (irrp(a))err(ush, "Can't ush x = $1 onto args a = $2", x, a);
+    //if (irrp(a))err(ush, "Can't ush x = $1 onto args a = $2", x, a);
     a.unshift(x);
     return a;
   }
   
   function shf(a){
-    if (irrp(a))err(shf, "Can't shf from args a = $1", a);
+    //if (irrp(a))err(shf, "Can't shf from args a = $1", a);
     return a.shift();
   }
   
@@ -1606,13 +1631,13 @@
     }
     
     function pop(a){
-      var x = car(a);
-      if (nilp(cdr(a))){
+      var x = a[0];
+      if (nilp(a[1])){
         a.pop();
         a.pop();
       } else {
-        a[0] = cadr(a);
-        a[1] = cddr(a);
+        a[0] = a[1][0]; // cadr(a);
+        a[1] = a[1][1]; // cddr(a);
       }
       return x;
     }
