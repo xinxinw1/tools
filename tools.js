@@ -138,17 +138,31 @@
     return a === b;
   }
   
+  function isn(a, b){
+    return a !== b;
+  }
+  
   function iso(a, b){
     if (is(a, b))return true;
     if (arrp(a) && arrp(b))return iarr(a, b);
+    if (objp(a) && objp(b))return iobj(a, b);
     if (rgxp(a) && rgxp(b))return irgx(a, b);
-    // todo: isoobj(a, b)
     return false;
   }
   
   function iarr(a, b){
     if (len(a) != len(b))return false;
     for (var i = 0; i < len(a); i++){
+      if (!is(a[i], b[i]))return false;
+    }
+    return true;
+  }
+  
+  function iobj(a, b){
+    for (var i in a){
+      if (!is(a[i], b[i]))return false;
+    }
+    for (var i in b){
       if (!is(a[i], b[i]))return false;
     }
     return true;
@@ -295,19 +309,28 @@
   
   function tarr(a){
     if (arrp(a))return a;
-    if (strp(a))return fold(function (r, x){
-      return psh(x, r);
-    }, [], a);
+    if (strp(a)){
+      var r = [];
+      for (var i = 0; i < a.length; i++)r.push(a[i]);
+      return r;
+    }
     if (objp(a))return foldi(function (r, x, i){
       return psh([i, x], r);
     }, [], a);
     err(tarr, "Can't coerce a = $1 to arr", a);
   }
   
-  function tfn(a){
+  function tfn(a, f){
     if (fnp(a))return a;
-    return function (x){
+    return tfna(a, f);
+  }
+  
+  function tfna(a, f){
+    if (f === udf)return function (x){
       return x === a;
+    };
+    return function (x){
+      return f(x, a);
     };
   }
   
@@ -1903,6 +1926,13 @@
     return process.exit();
   }
   
+  // global eval
+  function evl(a){
+    return (win.execScript || function (a){
+      return win["eval"].call(win, a);
+    })(a);
+  }
+  
   ////// Object exposure //////
   
   att({
@@ -1934,6 +1964,7 @@
     nulp: nulp,
     
     is: is,
+    isn: isn,
     iso: iso,
     inp: inp,
     
@@ -1957,6 +1988,7 @@
     str: str,
     tarr: tarr,
     tfn: tfn,
+    tfna: tfna,
     tobj: tobj,
     htm: htm,
     
@@ -2110,7 +2142,8 @@
     
     rnd: rnd,
     do1: do1,
-    exit: exit
+    exit: exit,
+    evl: evl
   }, $);
   
   if (nodep)module.exports = $;
