@@ -796,7 +796,7 @@
       }
       return -1;
     }
-    err(mat, "Can't match x = $1 a = $2", x, a);
+    err(mat, "Can't match x = $1 in a = $2", x, a);
   }
   
   function mats(x, a){
@@ -933,10 +933,11 @@
       if (strp(x) || rgxp(x))return a.split(x);
     }
     if (arrp(a)){
+      var f = tfn(x);
       var r = [];
       var last = 0;
       for (var i = 0; i < len(a); i++){
-        if (a[i] === x){
+        if (f(a[i])){
           psh(sli(a, last, i), r);
           last = i+1;
         }
