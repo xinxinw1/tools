@@ -2031,11 +2031,10 @@
   }
   
   function aload1(a, f){
-    att(elm("script", {type: "text/javascript",
-                       src: a,
-                       onreadystatechange: f,
-                       onload: f}),
-        elms("head")[0]);
+    var s = elm("script", {type: "text/javascript", src: a});
+    s.onreadystatechange = f;
+    s.onload = f;
+    att(s, elms("head")[0]);
   }
   
   ////// Other //////
