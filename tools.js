@@ -1596,6 +1596,24 @@
   
   //// New Type ////
   
+  /* import all
+  
+  var typ = $.typ2;
+  var tag = $.tag;
+  var rep = $.rep;
+  var det = $.det;
+  var dat = $.dat;
+  var sdat = $.sdat;
+  var mkdat = $.mkdat;
+  var mkbui = $.mkbui;
+  var isa = $.isa2;
+  var isany = $.isany;
+  var typin = $.typin;
+  var mkpre = $.mkpre;
+  var tagp = $.tagp;
+  
+  */
+  
   function typ2(a){
     return a.type;
   }
@@ -1996,6 +2014,30 @@
     return efn = f;
   }
   
+  ////// Import //////
+  
+  function aload(a, f){
+    if (arrp(a)){
+      var n = 0;
+      var l = len(a);
+      var f2 = function (){
+        n++;
+        if (n === l)f();
+      };
+      each(a, function (x){aload1(x, f2)});
+    } else {
+      aload1(a, f);
+    }
+  }
+  
+  function aload1(a, f){
+    att(elm("script", {type: "text/javascript",
+                       src: a,
+                       onreadystatechange: f,
+                       onload: f}),
+        elms("head")[0]);
+  }
+  
   ////// Other //////
   
   function rnd(mn, mx){
@@ -2237,6 +2279,9 @@
     err2: err2,
     gefn: gefn,
     sefn: sefn,
+    
+    aload: aload,
+    aload1: aload1,
     
     rnd: rnd,
     do1: do1,
