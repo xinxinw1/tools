@@ -689,6 +689,7 @@
   
   // remdup(x, a)
   
+  // remove from front
   function remf(x, a){
     if (arrp(a)){
       var f = tfn(x);
