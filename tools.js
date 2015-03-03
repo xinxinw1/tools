@@ -671,6 +671,7 @@
   
   // remdup(x, a)
   
+  // remove from front
   function remf(x, a){
     if (arrp(a)){
       var f = tfn(x);
@@ -1576,6 +1577,97 @@
     };
   }
   
+  //// New Type ////
+  
+  /* import all
+  
+  var typ = $.typ2;
+  var tag = $.tag;
+  var rep = $.rep;
+  var det = $.det;
+  var dat = $.dat;
+  var sdat = $.sdat;
+  var mkdat = $.mkdat;
+  var mkbui = $.mkbui;
+  var isa = $.isa2;
+  var isany = $.isany;
+  var typin = $.typin;
+  var mkpre = $.mkpre;
+  var tagp = $.tagp;
+  
+  */
+  
+  function typ2(a){
+    return a.type;
+  }
+  
+  function tag(a, x, y){
+    return a[x] = y;
+  }
+  
+  // n is probably never going to be greater than js int size
+  function rep(a, x){
+    return a[x];
+  }
+  
+  // detach
+  function det(a, x){
+    var r = a[x];
+    delete a[x];
+    return r;
+  }
+  
+  function dat(a){
+    return a.data;
+  }
+  
+  function sdat(a, x){
+    return a.data = x;
+  }
+  
+  function mkdat(t, d){
+    return {type: t, data: d};
+  }
+  
+  function mkbui(t){
+    return function (a){
+      return mkdat(t, a);
+    };
+  }
+  
+  function isa2(t, a){
+    return a.type === t;
+  }
+  
+  function isany(t){
+    var a = arguments;
+    for (var i = 1; i < a.length; i++){
+      if (isa2(t, a[i]))return true;
+    }
+    return false;
+  }
+  
+  function typin(a){
+    var tp = typ(a);
+    var t = arguments;
+    for (var i = 1; i < t.length; i++){
+      if (tp === t[i])return true;
+    }
+    return false;
+  }
+  
+  // return isa(t, a);
+  function mkpre(t){
+    return function (a){
+      return isa2(t, a);
+    };
+  }
+  
+  // !!a to deal with null and undefined inputs
+  function tagp(a){
+    return !!a && a.type !== udf;
+  }
+  
   //// Reference ////
   
   function self(a){
@@ -1905,6 +1997,29 @@
     return efn = f;
   }
   
+  ////// Import //////
+  
+  function aload(a, f){
+    if (arrp(a)){
+      var n = 0;
+      var l = len(a);
+      var f2 = function (){
+        n++;
+        if (n === l)f();
+      };
+      each(a, function (x){aload1(x, f2)});
+    } else {
+      aload1(a, f);
+    }
+  }
+  
+  function aload1(a, f){
+    var s = elm("script", {type: "text/javascript", src: a});
+    s.onreadystatechange = f;
+    s.onload = f;
+    att(s, elms("head")[0]);
+  }
+  
   ////// Other //////
   
   function rnd(mn, mx){
@@ -2092,6 +2207,20 @@
     man1: man1,
     man2: man2,
     
+    typ2: typ2,
+    tag: tag,
+    rep: rep,
+    det: det,
+    dat: dat,
+    sdat: sdat,
+    mkdat: mkdat,
+    mkbui: mkbui,
+    isa2: isa2,
+    isany: isany,
+    typin: typin,
+    mkpre: mkpre,
+    tagp: tagp,
+    
     self: self,
     
     L: L,
@@ -2132,6 +2261,9 @@
     err2: err2,
     gefn: gefn,
     sefn: sefn,
+    
+    aload: aload,
+    aload1: aload1,
     
     rnd: rnd,
     do1: do1,
