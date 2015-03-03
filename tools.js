@@ -1088,7 +1088,7 @@
   
   function nofArr(n, a){
     var r = [];
-    for (var i = n; i >= 1; i--)r.push(a);
+    for (var i = n; i >= 1; i--)att(a, r);
     return r;
   }
   
