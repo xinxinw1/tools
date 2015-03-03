@@ -435,24 +435,6 @@
     // (fold #[psh (f %2) %1] [] a)
     if (arrp(a)){
       var f = tfn(x);
-      return fold(function (r, a){
-        return psh(f(a), r);
-      }, [], a);
-    }
-    if (objp(a)){
-      var f = tfn(x);
-      return foldi(function (o, a, i){
-        o[i] = f(a);
-        return o;
-      }, {}, a);
-    }
-    err(map, "Can't map x = $1 over a = $2", x, a);
-  }
-  
-  function map(x, a){
-    // (fold #[psh (f %2) %1] [] a)
-    if (arrp(a)){
-      var f = tfn(x);
       var r = [];
       for (var i = 0; i < a.length; i++){
         r.push(f(a[i]));
