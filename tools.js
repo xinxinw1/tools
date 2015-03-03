@@ -354,7 +354,7 @@
   
   function prop(a){
     if (strp(a) || nump(a))return a;
-    err(prop, "Invalsid obj prop name a = $1", a);
+    err(prop, "Invalid obj prop name a = $1", a);
   }
   
   function htm(a){
