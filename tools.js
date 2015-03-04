@@ -462,7 +462,7 @@
   
   function mapArrFn(f, a){
     var r = [];
-    for (var i = 0; i < a.length; i++)r.push(f(a));
+    for (var i = 0; i < a.length; i++)r.push(f(a[i]));
     return r;
   }
   
