@@ -1792,6 +1792,47 @@
     return a;
   }
   
+  function his(a){
+    var hs = [];
+    var p = 0;
+    var tmp = "";
+    
+    function add(o){
+      psh(o, hs);
+      p = len(hs);
+    }
+    
+    function pre(){
+      if (p > 0){
+        if (p == len(hs))tmp = a.value;
+        p--;
+        a.value = hs[p];
+      }
+    }
+    
+    function nex(){
+      if (p <= len(hs)-1){
+        p++;
+        a.value = (p == len(hs))?tmp:hs[p];
+      }
+    }
+    
+    a.onkeydown = function (e){
+      var c = udfp(e.key)?e.keyCode:e.key;
+      if (inp(c, "ArrowUp", "Up", 38)){
+        pre();
+        return false;
+      }
+      if (inp(c, "ArrowDown", "Down", 40)){
+        nex();
+        return false;
+      }
+      return true;
+    };
+    
+    return {add: add};
+  }
+  
   ////// File //////
   
   /* Note: these functions only work in Node.js */
@@ -2127,6 +2168,7 @@
     foc: foc,
     atth: atth,
     seth: seth,
+    his: his,
     
     rea: rea,
     lns: lns,
