@@ -1900,6 +1900,16 @@
     al("a: $1 | b: $2", ta, tb);
   }
   
+  function spd1(f){
+    var t1, t2, i;
+    
+    t1 = tim();
+    f();
+    t2 = tim();
+    
+    return t2-t1;
+  }
+  
   function spd2(f, n){
     var t1, t2, i;
     
@@ -2184,6 +2194,7 @@
     pau: pau,
     
     spd: spd,
+    spd1: spd1,
     
     cnts: cnts,
     
