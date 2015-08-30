@@ -1,4 +1,4 @@
-/***** Tools 4.4.1 *****/
+/***** Tools 4.5.0 *****/
 
 (function (udf){
   var nodep = typeof window === "undefined";
@@ -1942,20 +1942,24 @@
   
   ////// Error //////
   
-  function Err(f, s, a){
-    this.f = f;
-    this.s = s;
-    this.a = a;
+  function Err(fn, sig, text, data){
+    if (udfp(data))data = {};
+    this.fn = fn;
+    this.sig = sig;
+    this.text = text;
+    this.data = data;
   }
   
   Err.prototype.toString = function (){
-    return "Error: " + this.s + ": " + this.a;
+    return "Error: " + this.sig + ": " + this.text;
   };
   
   var efn = function (e){};
   
-  function err(f){
-    var e = new Err(f, sig(f), apl(stf, sli(arguments, 1)));
+  function err(f, o){
+    var e;
+    if (!objp(o))e = new Err(f, sig(f), apl(stf, sli(arguments, 1)));
+    else e = new Err(f, sig(f), apl(stf, sli(arguments, 2)), o);
     efn(e);
     throw e.toString();
   }
