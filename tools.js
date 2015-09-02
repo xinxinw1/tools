@@ -1,4 +1,4 @@
-/***** Tools 4.5.0 *****/
+/***** Tools 4.5.1 *****/
 
 (function (udf){
   var nodep = typeof window === "undefined";
@@ -1554,6 +1554,12 @@
     return apl(a, sli(arguments, 1));
   }
   
+  // function test(a, b, c) -> "test"
+  function nam(a){
+    var n = cap(/function\s*([^\(]*)\(([^\)]*)\)/, dmp(a));
+    return (n[0] == "")?"function":n;
+  }
+  
   // function test(a, b, c) -> "test(a, b, c)"
   function sig(a){
     var n = cap(/function\s*([^\(]*\(([^\)]*)\))/, dmp(a));
@@ -2159,6 +2165,7 @@
     stf: stf,
     
     cal: cal,
+    nam: nam,
     sig: sig,
     prms: prms,
     cmb: cmb,
