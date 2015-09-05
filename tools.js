@@ -469,7 +469,6 @@
   // mapapp(x, a)
   
   function pos(x, a, n){
-    if (udfp(n))n = 0;
     if (arrp(a))return posArr(x, a, n);
     if (strp(a))return posStr(x, a, n);
     if (objp(a)){
@@ -484,6 +483,7 @@
   }
   
   function posArr(x, a, n){
+    if (udfp(n))n = 0;
     var f = tfn(x);
     for (var i = n; i < len(a); i++){
       if (f(a[i]))return i;
@@ -503,7 +503,7 @@
   }
   
   function posStrRgx(x, a, n){
-    var p = (udfp(n)?a:sli(a, n)).search(x);
+    var p = (udfp(n)?a:sliStr(a, n)).search(x);
     if (p == -1)return p;
     return p+n;
   }
