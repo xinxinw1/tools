@@ -354,7 +354,7 @@
   
   function prop(a){
     if (strp(a) || nump(a))return a;
-    err(prop, "Invalsid obj prop name a = $1", a);
+    err(prop, "Invalid obj prop name a = $1", a);
   }
   
   function htm(a){
@@ -429,24 +429,6 @@
   
   function apl(f, a){
     return f.apply(this, a);
-  }
-  
-  function map(x, a){
-    // (fold #[psh (f %2) %1] [] a)
-    if (arrp(a)){
-      var f = tfn(x);
-      return fold(function (r, a){
-        return psh(f(a), r);
-      }, [], a);
-    }
-    if (objp(a)){
-      var f = tfn(x);
-      return foldi(function (o, a, i){
-        o[i] = f(a);
-        return o;
-      }, {}, a);
-    }
-    err(map, "Can't map x = $1 over a = $2", x, a);
   }
   
   function map(x, a){
@@ -689,6 +671,7 @@
   
   // remdup(x, a)
   
+  // remove from front
   function remf(x, a){
     if (arrp(a)){
       var f = tfn(x);
