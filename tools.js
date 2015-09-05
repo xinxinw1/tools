@@ -1,4 +1,4 @@
-/***** Tools 4.5.1 *****/
+/***** Tools 4.6.0 *****/
 
 (function (udf){
   var nodep = typeof window === "undefined";
@@ -69,6 +69,10 @@
            c === "[object NodeList]" ||
            c === "[object NamedNodeMap]" || 
            c === "[object MozNamedAttrMap]";
+  }
+  
+  function arrp_(a){
+    return Object.prototype.toString.call(a) === "[object Array]";
   }
   
   function irrp(a){
@@ -144,13 +148,13 @@
   
   function iso(a, b){
     if (is(a, b))return true;
-    if (arrp(a) && arrp(b))return iarr(a, b);
-    if (objp(a) && objp(b))return iobj(a, b);
-    if (rgxp(a) && rgxp(b))return irgx(a, b);
+    if (arrp(a) && arrp(b))return isoArr(a, b);
+    if (objp(a) && objp(b))return isoObj(a, b);
+    if (rgxp(a) && rgxp(b))return isoRgx(a, b);
     return false;
   }
   
-  function iarr(a, b){
+  function isoArr(a, b){
     if (len(a) != len(b))return false;
     for (var i = 0; i < len(a); i++){
       if (!is(a[i], b[i]))return false;
@@ -158,7 +162,7 @@
     return true;
   }
   
-  function iobj(a, b){
+  function isoObj(a, b){
     for (var i in a){
       if (!is(a[i], b[i]))return false;
     }
@@ -168,7 +172,7 @@
     return true;
   }
   
-  function irgx(a, b){
+  function isoRgx(a, b){
     return is(a.source, b.source) &&
            is(a.global, b.global) &&
            is(a.ignoreCase, b.ignoreCase) &&
@@ -210,11 +214,11 @@
       if (L.has(a, L.cdr(ds)))return "[...]";
       return "[" + joi(map(dsp, a), ", ") + "]";
     }
-    if (strp(a))return dstr(a);
+    if (strp(a))return dspStr(a);
     if (fnp(a))return sig(a);
     if (objp(a)){
       if (L.has(a, L.cdr(ds)))return "{...}";
-      return dobj(a);
+      return dspObj(a);
     }
     if (winp(a))return "win";
     if (docp(a))return "doc";
@@ -235,14 +239,14 @@
   }
   
   // (var to (map [+ "\\" _] #["\\", "\"", "n", "r", "t", "b", "f"]))
-  function dstr(a){
+  function dspStr(a){
     var fr = ["\\", "\"", "\n", "\r", "\t", "\b", "\f"];
     var to = ["\\\\", "\\\"", "\\n", "\\r", "\\t", "\\b", "\\f"];
     return "\"" + rpl(fr, to, a) + "\"";
   }
   
-  // can't use fold because dobj is used on fns and arrs too
-  function dobj(a){
+  // can't use fold because dspObj is used on fns and arrs too
+  function dspObj(a){
     var r = [];
     for (var i in a){
       psh(i + ": " + dsp(a[i]), r);
@@ -354,7 +358,7 @@
   
   function prop(a){
     if (strp(a) || nump(a))return a;
-    err(prop, "Invalsid obj prop name a = $1", a);
+    err(prop, "Invalid obj prop name a = $1", a);
   }
   
   function htm(a){
@@ -420,9 +424,17 @@
     return a[0];
   }
   
+  function fst_(a){
+    return a[0];
+  }
+  
   function las(a){
     if (htmp(a))return a.lastChild;
-    return a[len(a)-1];
+    return a[len_(a)-1];
+  }
+  
+  function las_(a){
+    return a[a.length-1];
   }
   
   //// Apply ////
@@ -433,12 +445,7 @@
   
   function map(x, a){
     // (fold #[psh (f %2) %1] [] a)
-    if (arrp(a)){
-      var f = tfn(x);
-      return fold(function (r, a){
-        return psh(f(a), r);
-      }, [], a);
-    }
+    if (arrp(a))return mapArr(x, a);
     if (objp(a)){
       var f = tfn(x);
       return foldi(function (o, a, i){
@@ -449,51 +456,21 @@
     err(map, "Can't map x = $1 over a = $2", x, a);
   }
   
-  function map(x, a){
-    // (fold #[psh (f %2) %1] [] a)
-    if (arrp(a)){
-      var f = tfn(x);
-      var r = [];
-      for (var i = 0; i < a.length; i++){
-        r.push(f(a[i]));
-      }
-      return r;
-    }
-    if (objp(a)){
-      var f = tfn(x);
-      return foldi(function (o, a, i){
-        o[i] = f(a);
-        return o;
-      }, {}, a);
-    }
-    err(map, "Can't map x = $1 over a = $2", x, a);
+  function mapArr(x, a){
+    return mapArrFn(tfn(x), a);
+  }
+  
+  function mapArrFn(f, a){
+    var r = [];
+    for (var i = 0; i < a.length; i++)r.push(f(a[i]));
+    return r;
   }
   
   // mapapp(x, a)
   
   function pos(x, a, n){
-    if (udfp(n))n = 0;
-    if (arrp(a)){
-      var f = tfn(x);
-      for (var i = n; i < len(a); i++){
-        if (f(a[i]))return i;
-      }
-      return -1;
-    }
-    if (strp(a)){
-      if (strp(x))return a.indexOf(x, n);
-      if (rgxp(x)){
-        var p = sli(a, n).search(x);
-        if (p == -1)return p;
-        return p+n;
-      }
-      if (arrp(x))return fold(function (m, i){
-        var curr = pos(i, a, n);
-        if (curr == -1)return m;
-        if (m == -1)return curr;
-        return Math.min(m, curr);
-      }, -1, x);
-    }
+    if (arrp(a))return posArr(x, a, n);
+    if (strp(a))return posStr(x, a, n);
     if (objp(a)){
       var f = tfn(x);
       for (var i in a){
@@ -503,6 +480,41 @@
     }
     if (htmp(a))return pos(x, kids(a), n);
     err(pos, "Can't get pos of x = $1 in a = $2 from n = $3", x, a, n);
+  }
+  
+  function posArr(x, a, n){
+    if (udfp(n))n = 0;
+    var f = tfn(x);
+    for (var i = n; i < len(a); i++){
+      if (f(a[i]))return i;
+    }
+    return -1;
+  }
+  
+  function posStr(x, a, n){
+    if (strp(x))return posStrStr(x, a, n);
+    if (rgxp(x))return posStrRgx(x, a, n);
+    if (arrp(x))return posStrArr(x, a, n);
+    err(posStr, "Can't get pos of x = $1 in str a = $2 from n = $3", x, a, n);
+  }
+  
+  function posStrStr(x, a, n){
+    return a.indexOf(x, n);
+  }
+  
+  function posStrRgx(x, a, n){
+    var p = (udfp(n)?a:sliStr(a, n)).search(x);
+    if (p == -1)return p;
+    return p+n;
+  }
+  
+  function posStrArr(x, a, n){
+    return fold(function (m, i){
+      var curr = pos(i, a, n);
+      if (curr == -1)return m;
+      if (m == -1)return curr;
+      return Math.min(m, curr);
+    }, -1, x);
   }
   
   function pol(x, a, n){
@@ -689,6 +701,7 @@
   
   // remdup(x, a)
   
+  // remove from front
   function remf(x, a){
     if (arrp(a)){
       var f = tfn(x);
@@ -729,54 +742,72 @@
   }
   
   function rpl(x, y, a){
-    if (strp(a)){
-      // a.replace(x, y) only replaces first occurrence!
-      if (strp(x)){
-        var s = ""; var i = 0;
-        while (i < a.length){
-          if (pos(x, a, i) == i){
-            s += y;
-            i += x.length;
-          } else {
-            s += a[i];
-            i += 1;
-          }
-        }
-        return s;
-      }
-      if (rgxp(x))return a.replace(x, y);
-      if (arrp(x)){
-        var s = ""; var i = 0; var k;
-        while (i < a.length){
-          for (k = 0; k < x.length; k++){
-            if (pos(x[k], a, i) == i){
-              s += arrp(y)?y[k]:y;
-              i += x[k].length;
-              break;
-            }
-          }
-          if (k == x.length){
-            s += a[i];
-            i += 1;
-          }
-        }
-        return s;
-      }
-    }
-    if (arrp(a)){
-      var f = tfn(x);
-      return fold(function (r, a){
-        return psh(f(a)?y:a, r);
-      }, [], a);
-    }
-    if (objp(a)){
-      var f = tfn(x);
-      return foldi(function (o, a, i){
-        o[i] = f(a)?y:a;
-        return o;
-      }, {}, a);
-    }
+    if (strp(a))return rplStr(x, y, a);
+    if (arrp(a))return rplArr(x, y, a);
+    if (objp(a))return rplObj(x, y, a);
     err(rpl, "Can't rpl x = $1 with y = $2 in a = $3", x, y, a);
+  }
+  
+  function rplStr(x, y, a){
+    if (strp(x))return rplStrStr(x, y, a);
+    if (rgxp(x))return rplStrRgx(x, y, a);
+    if (arrp(x))return rplStrArr(x, y, a);
+    err(rplStr, "Can't rpl x = $1 with y = $2 in str a = $3", x, y, a);
+  }
+  
+  function rplStrStr(x, y, a){
+    // a.replace(x, y) only replaces first occurrence!
+    var s = ""; var i = 0;
+    while (i < a.length){
+      if (posStrStr(x, a, i) == i){
+        s += y;
+        i += x.length;
+      } else {
+        s += a[i];
+        i += 1;
+      }
+    }
+    return s;
+  }
+  
+  function rplStrRgx(x, y, a){
+    return a.replace(x, y);
+  }
+  
+  function rplStrArr(x, y, a){
+    var s = ""; var i = 0; var k;
+    while (i < a.length){
+      for (k = 0; k < x.length; k++){
+        if (posStr(x[k], a, i) == i){
+          s += arrp(y)?y[k]:y;
+          i += x[k].length;
+          break;
+        }
+      }
+      if (k == x.length){
+        s += a[i];
+        i += 1;
+      }
+    }
+    return s;
+  }
+  
+  function rplArr(x, y, a){
+    var f = tfn(x);
+    var r = [];
+    for (var i = 0; i < a.length; i++){
+      r.push(f(a[i])?y:a[i]);
+    }
+    return r;
+  }
+  
+  function rplObj(x, y, a){
+    var f = tfn(x);
+    var o = {};
+    for (var i in a){
+      o[i] = f(a[i])?y:a[i];
+    }
+    return o;
   }
   
   function mat(x, a){
@@ -838,6 +869,10 @@
     err(len, "Can't get len of a = $1", a);
   }
   
+  function len_(a){
+    return a.length;
+  }
+  
   function emp(a){
     if (arrp(a) || strp(a) || fnp(a))return a.length === 0;
     if (objp(a))return len(a) === 0;
@@ -847,12 +882,21 @@
   }
   
   function cpy(a){
-    if (arrp(a) || objp(a))return map(self, a);
+    if (arrp(a))return cpyArr(a);
+    if (objp(a))return cpyObj(a);
     if (htmp(a))return a.cloneNode(false);
     return a;
   }
   
-  function cpyobj(a){
+  function cpyArr(a){
+    var r = [];
+    for (var i = 0; i < a.length; i++){
+      r[i] = a[i];
+    }
+    return r;
+  }
+  
+  function cpyObj(a){
     var o = {};
     for (var i in a){
       o[i] = a[i];
@@ -881,12 +925,22 @@
   //// Parts ////
   
   function sli(a, n, m){
-    if (n < 0)n = 0;
-    if (!udfp(m) && m < n)m = n;
-    if (strp(a))return a.substring(n, m);
-    if (arrp(a))return (irrp(a)?cpy(a):a).slice(n, m);
+    if (strp(a))return sliStr(a, n, m);
+    if (arrp(a))return sliArr(a, n, m);
     if (htmp(a))return sli(kids(a), n, m);
     err(sli, "Can't slice a = $1 from n = $2 to m = $3", a, n, m);
+  }
+  
+  function sliStr(a, n, m){
+    if (n < 0)n = 0;
+    if (!udfp(m) && m < n)m = n;
+    return a.substring(n, m);
+  }
+  
+  function sliArr(a, n, m){
+    if (n < 0)n = 0;
+    if (!udfp(m) && m < n)m = n;
+    return (irrp(a)?cpy(a):a).slice(n, m);
   }
   
   function fstn(n, a){
@@ -1022,17 +1076,21 @@
   }
   
   function nof(n, a){
-    if (strp(a)){
-      var s = "";
-      for (var i = n; i >= 1; i--)s += a;
-      return s;
-    }
-    if (arrp(a)){
-      var r = [];
-      for (var i = n; i >= 1; i--)att(a, r);
-      return r;
-    }
+    if (strp(a))return nofStr(n, a);
+    if (arrp(a))return nofArr(n, a);
     err(nof, "Can't make n = $1 of a = $2", n, a);
+  }
+  
+  function nofStr(n, a){
+    var s = "";
+    for (var i = n; i >= 1; i--)s += a;
+    return s;
+  }
+  
+  function nofArr(n, a){
+    var r = [];
+    for (var i = n; i >= 1; i--)att(a, r);
+    return r;
   }
   
   //// ??? ////
@@ -1551,7 +1609,7 @@
   ////// Function //////
   
   function cal(a){
-    return apl(a, sli(arguments, 1));
+    return apl(a, sliArr(arguments, 1));
   }
   
   // function test(a, b, c) -> "test"
@@ -2020,6 +2078,7 @@
     nump: nump,
     strp: strp,
     arrp: arrp,
+    arrp_: arrp_,
     irrp: irrp,
     fnp: fnp,
     objp: objp,
@@ -2038,13 +2097,17 @@
     is: is,
     isn: isn,
     iso: iso,
+    isoArr: isoArr,
+    isoObj: isoObj,
+    isoRgx: isoRgx,
+    
     inp: inp,
     
     sta: sta,
     
     dsp: dsp,
-    dstr: dstr,
-    dobj: dobj,
+    dspStr: dspStr,
+    dspObj: dspObj,
     dmp: dmp,
     
     out: out,
@@ -2070,11 +2133,20 @@
     ins: ins,
     del: del,
     fst: fst,
+    fst_: fst_,
     las: las,
+    las_: las_,
     
     apl: apl,
     map: map,
+    mapArr: mapArr,
+    mapArrFn: mapArrFn,
     pos: pos,
+    posArr: posArr,
+    posStr: posStr,
+    posStrStr: posStrStr,
+    posStrRgx: posStrRgx,
+    posStrArr: posStrArr,
     pol: pol,
     pss: pss,
     has: has,
@@ -2084,17 +2156,27 @@
     rem: rem,
     remf: remf,
     rpl: rpl,
+    rplStr: rplStr,
+    rplStrStr: rplStrStr,
+    rplStrRgx: rplStrRgx,
+    rplStrArr: rplStrArr,
+    rplArr: rplArr,
+    rplObj: rplObj,
     mat: mat,
     mats: mats,
     
     len: len,
+    len_: len_,
     emp: emp,
     cpy: cpy,
-    cpyobj: cpyobj,
+    cpyArr: cpyArr,
+    cpyObj: cpyObj,
     cln: cln,
     rev: rev,
     
     sli: sli,
+    sliStr: sliStr,
+    sliArr: sliArr,
     fstn: fstn,
     lasn: lasn,
     rstn: rstn,
@@ -2109,14 +2191,13 @@
     grp: grp,
     tup: tup,
     
-    hea: hea,
-    tai: tai,
-    
     joi: joi,
     fla: fla,
     app: app,
     app2: app2,
     nof: nof,
+    nofStr: nofStr,
+    nofArr: nofArr,
     
     evry: evry,
     
@@ -2124,6 +2205,9 @@
     foldi: foldi,
     foldr: foldr,
     foldri: foldri,
+    
+    hea: hea,
+    tai: tai,
     
     beg: beg,
     end: end,
