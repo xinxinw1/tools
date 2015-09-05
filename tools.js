@@ -148,13 +148,13 @@
   
   function iso(a, b){
     if (is(a, b))return true;
-    if (arrp(a) && arrp(b))return iarr(a, b);
-    if (objp(a) && objp(b))return iobj(a, b);
-    if (rgxp(a) && rgxp(b))return irgx(a, b);
+    if (arrp(a) && arrp(b))return isoArr(a, b);
+    if (objp(a) && objp(b))return isoObj(a, b);
+    if (rgxp(a) && rgxp(b))return isoRgx(a, b);
     return false;
   }
   
-  function iarr(a, b){
+  function isoArr(a, b){
     if (len(a) != len(b))return false;
     for (var i = 0; i < len(a); i++){
       if (!is(a[i], b[i]))return false;
@@ -162,7 +162,7 @@
     return true;
   }
   
-  function iobj(a, b){
+  function isoObj(a, b){
     for (var i in a){
       if (!is(a[i], b[i]))return false;
     }
@@ -172,7 +172,7 @@
     return true;
   }
   
-  function irgx(a, b){
+  function isoRgx(a, b){
     return is(a.source, b.source) &&
            is(a.global, b.global) &&
            is(a.ignoreCase, b.ignoreCase) &&
@@ -214,11 +214,11 @@
       if (L.has(a, L.cdr(ds)))return "[...]";
       return "[" + joi(map(dsp, a), ", ") + "]";
     }
-    if (strp(a))return dstr(a);
+    if (strp(a))return dspStr(a);
     if (fnp(a))return sig(a);
     if (objp(a)){
       if (L.has(a, L.cdr(ds)))return "{...}";
-      return dobj(a);
+      return dspObj(a);
     }
     if (winp(a))return "win";
     if (docp(a))return "doc";
@@ -239,14 +239,14 @@
   }
   
   // (var to (map [+ "\\" _] #["\\", "\"", "n", "r", "t", "b", "f"]))
-  function dstr(a){
+  function dspStr(a){
     var fr = ["\\", "\"", "\n", "\r", "\t", "\b", "\f"];
     var to = ["\\\\", "\\\"", "\\n", "\\r", "\\t", "\\b", "\\f"];
     return "\"" + rpl(fr, to, a) + "\"";
   }
   
-  // can't use fold because dobj is used on fns and arrs too
-  function dobj(a){
+  // can't use fold because dspObj is used on fns and arrs too
+  function dspObj(a){
     var r = [];
     for (var i in a){
       psh(i + ": " + dsp(a[i]), r);
@@ -2097,13 +2097,17 @@
     is: is,
     isn: isn,
     iso: iso,
+    isoArr: isoArr,
+    isoObj: isoObj,
+    isoRgx: isoRgx,
+    
     inp: inp,
     
     sta: sta,
     
     dsp: dsp,
-    dstr: dstr,
-    dobj: dobj,
+    dspStr: dspStr,
+    dspObj: dspObj,
     dmp: dmp,
     
     out: out,
