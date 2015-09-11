@@ -1,4 +1,4 @@
-/***** Tools 4.6.0 *****/
+/***** Tools 4.6.1 *****/
 
 (function (udf){
   var nodep = typeof window === "undefined";
@@ -503,7 +503,8 @@
   }
   
   function posStrRgx(x, a, n){
-    var p = (udfp(n)?a:sliStr(a, n)).search(x);
+    if (udfp(n))n = 0;
+    var p = ((n === 0)?a:sliStr(a, n)).search(x);
     if (p == -1)return p;
     return p+n;
   }
