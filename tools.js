@@ -1,4 +1,4 @@
-/***** Tools 4.6.1 *****/
+/***** Tools 4.7.0 *****/
 
 (function (udf){
   var nodep = typeof window === "undefined";
@@ -1762,6 +1762,110 @@
     };
   })();
   
+  ////// Lisp Type //////
+  
+  var T = (function (){
+    function typ(a){
+      return a.type;
+    }
+    
+    function tag(a, x, y){
+      return a[x] = y;
+    }
+    
+    // n is probably never going to be greater than js int size
+    function rep(a, x){
+      return a[x];
+    }
+    
+    // detach
+    function det(a, x){
+      var r = a[x];
+      delete a[x];
+      return r;
+    }
+    
+    function dat(a){
+      return a.data;
+    }
+    
+    function sdat(a, x){
+      return a.data = x;
+    }
+    
+    //// Builders ////
+    
+    function mk(t, o){
+      if (udfp(o))return {type: t};
+      return app(o, {type: t});
+    }
+    
+    function mkdat(t, d, o){
+      if (udfp(o))return {type: t, data: d};
+      return app(o, {type: t, data: d});
+    }
+    
+    function mkbui(t){
+      return function (a){
+        return mkdat(t, a);
+      };
+    }
+    
+    //// Predicates ////
+    
+    function isa(t, a){
+      return a.type === t;
+    }
+    
+    function isany(t){
+      var a = arguments;
+      for (var i = 1; i < a.length; i++){
+        if (isa(t, a[i]))return true;
+      }
+      return false;
+    }
+    
+    function typin(a){
+      var tp = typ(a);
+      var t = arguments;
+      for (var i = 1; i < t.length; i++){
+        if (tp === t[i])return true;
+      }
+      return false;
+    }
+    
+    // return isa(t, a);
+    function mkpre(t){
+      return function (a){
+        return a.type === t;
+      };
+    }
+    
+    // !!a to deal with null and undefined inputs
+    function tagp(a){
+      return !!a && a.type !== udf;
+    }
+    
+    return {
+      typ: typ,
+      tag: tag,
+      rep: rep,
+      det: det,
+      dat: dat,
+      sdat: sdat,
+      
+      mk: mk,
+      mkdat: mkdat,
+      mkbui: mkbui,
+      
+      isa: isa,
+      isany: isany,
+      typin: typin,
+      mkpre: mkpre,
+      tagp: tagp
+    };
+  })();
+  
   ////// DOM //////
   
   /* Note: these functions won't work in Node.js */
@@ -2260,6 +2364,8 @@
     self: self,
     
     L: L,
+    
+    T: T,
     
     elms: elms,
     elm: elm,
