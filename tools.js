@@ -1,4 +1,4 @@
-/***** Tools 4.7.0 *****/
+/***** Tools 4.7.1 *****/
 
 (function (udf){
   var nodep = typeof window === "undefined";
@@ -1961,6 +1961,9 @@
     return a;
   }
   
+  // var h = his($("test"));
+  // h.add("hey");
+  // $("test").value = "";
   function his(a){
     var hs = [];
     var p = 0;
