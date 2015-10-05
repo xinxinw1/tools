@@ -1,4 +1,4 @@
-/***** Tools 4.8.0 *****/
+/***** Tools 4.8.1 *****/
 
 (function (udf){
   var nodep = typeof window === "undefined";
@@ -421,6 +421,12 @@
   
   function fst(a){
     if (htmp(a))return a.firstChild;
+    if (objp(a)){
+      for (var i in a){
+        return a[i];
+      }
+      return udf;
+    }
     return a[0];
   }
   
