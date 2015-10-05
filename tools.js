@@ -1,4 +1,4 @@
-/***** Tools 4.7.1 *****/
+/***** Tools 4.8.0 *****/
 
 (function (udf){
   var nodep = typeof window === "undefined";
@@ -853,7 +853,25 @@
   // fstf(f, a) == mat(f, a)
   // lasf(f, a)
   
-  // cnt(x, a)
+  function cnt(x, a){
+    if (arrp(a)){
+      var f = tfn(x);
+      var n = 0;
+      for (var i = 0; i < len_(a); i++){
+        if (f(a[i]))n++;
+      }
+      return n;
+    }
+    if (objp(a)){
+      var f = tfn(x);
+      var n = 0;
+      for (var i in a){
+        if (f(a[i]))n++;
+      }
+      return n;
+    }
+    err(cnt, "Can't count number of x = $1 in a = $2", x, a);
+  }
   
   //// Whole ////
   
@@ -2152,7 +2170,7 @@
   
   ////// Other //////
   
-  function rnd(mn, mx){
+  function rand(mn, mx){
     return Math.floor(Math.random()*(mx-mn+1))+mn;
   }
   
@@ -2272,6 +2290,7 @@
     rplObj: rplObj,
     mat: mat,
     mats: mats,
+    cnt: cnt,
     
     len: len,
     len_: len_,
@@ -2409,7 +2428,7 @@
     gefn: gefn,
     sefn: sefn,
     
-    rnd: rnd,
+    rand: rand,
     do1: do1,
     exit: exit,
     evl: evl
