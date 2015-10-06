@@ -1,4 +1,4 @@
-/***** Tools 4.8.1 *****/
+/***** Tools 4.8.2 *****/
 
 (function (udf){
   var nodep = typeof window === "undefined";
@@ -260,13 +260,13 @@
   
   ////// Output //////
   
-  function out(a){
+  function ou(a){
     if (udfp(a))a = "";
     console.log(a);
   }
   
-  function prn(){
-    out(apl(stf, arguments));
+  function out(){
+    ou(apl(stf, arguments));
   }
   
   function alr(a){
@@ -2242,8 +2242,8 @@
     dspObj: dspObj,
     dmp: dmp,
     
+    ou: ou,
     out: out,
-    prn: prn,
     alr: alr,
     al: al,
     echo: echo,
