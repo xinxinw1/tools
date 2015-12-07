@@ -1,4 +1,4 @@
-/***** Tools 4.9.0 *****/
+/***** Tools 4.9.1 *****/
 
 (function (udf){
   var nodep = typeof window === "undefined";
@@ -365,7 +365,7 @@
     if (htmp(a))return a;
     if (strp(a))return txt(a);
     if (arrp(a))return apl(elm, a);
-    err(htm, "Can't coerce a = $1 to htm", a);
+    return htm(dsp(a));
   }
   
   ////// Sequence //////
