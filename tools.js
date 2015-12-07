@@ -1,4 +1,4 @@
-/***** Tools 4.8.2 *****/
+/***** Tools 4.9.0 *****/
 
 (function (udf){
   var nodep = typeof window === "undefined";
@@ -192,7 +192,7 @@
   ////// Dynamic vars //////
   
   function sta(a, x, f){
-    L.psh(x, a);
+    L.push(x, a);
     var r = f();
     L.pop(a);
     return r;
@@ -249,7 +249,7 @@
   function dspObj(a){
     var r = [];
     for (var i in a){
-      psh(i + ": " + dsp(a[i]), r);
+      push(i + ": " + dsp(a[i]), r);
     }
     return "{" + joi(r, ", ") + "}";
   }
@@ -319,7 +319,7 @@
       return r;
     }
     if (objp(a))return foldi(function (r, x, i){
-      return psh([i, x], r);
+      return push([i, x], r);
     }, [], a);
     err(tarr, "Can't coerce a = $1 to arr", a);
   }
@@ -450,7 +450,7 @@
   }
   
   function map(x, a){
-    // (fold #[psh (f %2) %1] [] a)
+    // (fold #[push (f %2) %1] [] a)
     if (arrp(a))return mapArr(x, a);
     if (objp(a)){
       var f = tfn(x);
@@ -550,7 +550,7 @@
     if (arrp(a)){
       var f = tfn(x);
       return foldi(function (r, a, i){
-        if (f(a))return psh(i, r);
+        if (f(a))return push(i, r);
         return r;
       }, [], a);
     }
@@ -562,7 +562,7 @@
             curr = x[k];
             for (var v = 0; true; v++){
               if (i+v == len(a) || v == len(curr)){
-                psh(i, r);
+                push(i, r);
                 break;
               }
               if (a[i+v] !== curr[v])break;
@@ -576,7 +576,7 @@
         for (var i = 0; i < len(a); i++){
           for (var v = 0; true; v++){
             if (i+v == len(a) || v == len(x)){
-              psh(i, r);
+              push(i, r);
               break;
             }
             if (a[i+v] !== x[v])break;
@@ -589,7 +589,7 @@
       var f = tfn(x);
       var r = [];
       for (var i in a){
-        if (f(a[i]))psh(i, r);
+        if (f(a[i]))push(i, r);
       }
       return r;
     }
@@ -687,12 +687,12 @@
       var f = tfn(x);
       var r = [];
       for (var i = 0; i < a.length; i++){
-        if (!f(a[i]))psh(a[i], r);
+        if (!f(a[i]))push(a[i], r);
       }
       return r;
       /*return fold(function (r, i){
         if (f(i))return r;
-        return psh(i, r);
+        return push(i, r);
       }, [], a);*/
     }
     if (strp(a))return rpl(x, "", a);
@@ -843,13 +843,13 @@
       return nulp(r)?[]:r;
     }
     if (arrp(a))return fold(function (r, i){
-      if (x(i))return psh(i, r);
+      if (x(i))return push(i, r);
       return r;
     }, [], a);
     if (objp(a)){
       var r = [];
       for (var i in a){
-        if (x(a[i]))psh(a[i], r);
+        if (x(a[i]))push(a[i], r);
       }
       return r;
     }
@@ -1017,11 +1017,11 @@
       var last = 0;
       for (var i = 0; i < len(a); i++){
         if (f(a[i])){
-          psh(sli(a, last, i), r);
+          push(sli(a, last, i), r);
           last = i+1;
         }
       }
-      return psh(sli(a, last, len(a)), r);
+      return push(sli(a, last, len(a)), r);
     }
     err(spl, "Can't split a = $1 by x = $2", a, x);
   }
@@ -1035,7 +1035,7 @@
     if (n > 0){
       var r = [];
       for (var i = 0; i < len(a); i += n){
-        psh(sli(a, i, i+n), r);
+        push(sli(a, i, i+n), r);
       }
       return r;
     }
@@ -1050,7 +1050,7 @@
     if (len(a) > 0){
       var m = apl(Math.min, map(len, a));
       for (var i = 0; i < m; i++){
-        psh(map(function (x){
+        push(map(function (x){
           return x[i];
         }, a), r);
       }
@@ -1082,7 +1082,7 @@
   function app2(a, b){
     if (strp(a))return a+(strp(b)?b:str1(b));
     if (arrp(a)){
-      if (!arrp(b))return tai(a, b);
+      if (!arrp(b))return tail(a, b);
       return (irrp(a)?cpy(a):a).concat(b);
     }
     if (objp(a)){
@@ -1125,7 +1125,7 @@
     if (arrp(a)){
       var r = [];
       for (var i = m; i < len(a); i += n){
-        psh(a[i], r);
+        push(a[i], r);
       }
       return r;
     }
@@ -1259,12 +1259,12 @@
   
   //// Array ////
   
-  function hea(a, x){
+  function head(x, a){
     return ush(x, cpy(a));
   }
   
-  function tai(a, x){
-    return psh(x, cpy(a));
+  function tail(a, x){
+    return push(x, cpy(a));
   }
   
   //// Other ////
@@ -1442,8 +1442,8 @@
   
   //// Array ////
   
-  function psh(x, a){
-    //if (irrp(a))err(psh, "Can't psh x = $1 onto uarr a = $2", x, a);
+  function push(x, a){
+    //if (irrp(a))err(push, "Can't push x = $1 onto uarr a = $2", x, a);
     a.push(x);
     return a;
   }
@@ -1453,8 +1453,8 @@
     return a.pop();
   }
   
-  function ush(x, a){
-    //if (irrp(a))err(ush, "Can't ush x = $1 onto args a = $2", x, a);
+  function ushf(x, a){
+    //if (irrp(a))err(ushf, "Can't ushf x = $1 onto args a = $2", x, a);
     a.unshift(x);
     return a;
   }
@@ -1469,7 +1469,7 @@
   function att(x, a){
     if (arrp(a)){
       man1(function (x){
-        psh(x, a);
+        push(x, a);
       })(x);
       return a;
     }
@@ -1500,7 +1500,7 @@
     }, a);
     var r = [];
     for (var i in a){
-      psh(i, r);
+      push(i, r);
     }
     return r;
   }
@@ -1512,7 +1512,7 @@
     }, a);
     var r = [];
     for (var i in a){
-      psh(a[i], r);
+      push(a[i], r);
     }
     return r;
   }
@@ -1540,7 +1540,7 @@
       if (!arrp(a[i]))err(aset, "Can't aset x = $1 in a = $2 to y = $3", x, a, y);
       if (a[i][0] === x)return a[i][1] = y;
     }
-    psh([x, y], a);
+    push([x, y], a);
     return y;
   }
   
@@ -1633,7 +1633,7 @@
   
   ////// Function //////
   
-  function cal(a){
+  function call(a){
     return apl(a, sliArr(arguments, 1));
   }
   
@@ -1742,7 +1742,7 @@
       return a === b || nilp(a) && nilp(b);
     }
     
-    function psh(x, a){
+    function push(x, a){
       if (nilp(a)){
         a[1] = [];
         a[0] = x;
@@ -1781,7 +1781,7 @@
       
       has: has,
       is: is,
-      psh: psh,
+      push: push,
       pop: pop
     };
   })();
@@ -1994,7 +1994,7 @@
     var tmp = "";
     
     function add(o){
-      psh(o, hs);
+      push(o, hs);
       p = len(hs);
     }
     
@@ -2060,8 +2060,86 @@
   
   ////// Time //////
   
-  function tim(){
+  function currtim(){
     return (new Date()).getTime();
+  }
+  
+  function tim1(f){
+    var t1, t2;
+    
+    t1 = currtim();
+    f();
+    t2 = currtim();
+    
+    return t2-t1;
+  }
+  
+  function tim(f){
+    var args = sli(arguments, 1);
+    return tim1(function (){f.apply(this, args)});
+  }
+  
+  function ntim(n, f){
+    var args = sli(arguments, 2);
+    return tim(function (){for (var i = n; i >= 1; i--)f.apply(this, args)});
+  }
+  
+  function calltim(f){
+    var args = sli(arguments, 1);
+    var t1, t2, ret;
+    
+    t1 = currtim();
+    ret = f.apply(this, args);
+    t2 = currtim();
+    
+    return [ret, t2-t1];
+  }
+  
+  function calltim1(f){
+    var t1, t2, ret;
+    
+    t1 = currtim();
+    ret = f();
+    t2 = currtim();
+    
+    return [ret, t2-t1];
+  }
+  
+  function calltim(f){
+    var args = sli(arguments, 1);
+    return calltim1(function (){return f.apply(this, args)});
+  }
+  
+  var JSMAXINT = 9007199254740991;
+  // returns speed of exectution in ms/run
+  function autotim1(f){
+    var n = 1, t;
+    while (true){
+      t = ntim(n, f);
+      if (t >= 1000)return t/n;
+      if (t >= 100)n *= 2;
+      else n *= 10;
+      if (n > JSMAXINT)return t/n;
+    }
+  }
+  
+  function autotim(f){
+    var args = sli(arguments, 1);
+    return autotim1(function (){return f.apply(this, args)});
+  }
+  
+  function spd(){
+    return map(autotim1, arguments);
+  }
+  
+  function timer(){
+    var t1 = currtim();
+    
+    function time(){
+      return currtim()-t1;
+    }
+    
+    return {time: time};
   }
   
   function lat(f, n){
@@ -2079,41 +2157,10 @@
   }
   
   function pau(t){
-    var d = tim();
+    var d = currtim();
     var c;
-    do c = tim();
+    do c = currtim();
     while (c-d < t);
-  }
-  
-  ////// Speed tests //////
-  
-  function spd(a, b, n){
-    var ta, tb;
-    
-    ta = spd2(a, n);
-    tb = spd2(b, n);
-    
-    al("a: $1 | b: $2", ta, tb);
-  }
-  
-  function spd1(f){
-    var t1, t2, i;
-    
-    t1 = tim();
-    f();
-    t2 = tim();
-    
-    return t2-t1;
-  }
-  
-  function spd2(f, n){
-    var t1, t2, i;
-    
-    t1 = tim();
-    for (i = 1; i <= n; i++)f();
-    t2 = tim();
-    
-    return t2-t1;
   }
   
   ////// Debug //////
@@ -2339,8 +2386,8 @@
     foldr: foldr,
     foldri: foldri,
     
-    hea: hea,
-    tai: tai,
+    head: head,
+    tail: tail,
     
     beg: beg,
     end: end,
@@ -2354,9 +2401,9 @@
     mrev: mrev,
     clr: clr,
     
-    psh: psh,
+    push: push,
     pop: pop,
-    ush: ush,
+    ushf: ushf,
     shf: shf,
     
     att: att,
@@ -2381,7 +2428,7 @@
     upp: upp,
     stf: stf,
     
-    cal: cal,
+    call: call,
     nam: nam,
     sig: sig,
     prms: prms,
@@ -2417,14 +2464,19 @@
     cap: cap,
     caps: caps,
     
+    tim1: tim1,
     tim: tim,
+    ntim: ntim,
+    calltim1: calltim1,
+    calltim: calltim,
+    autotim1: autotim1,
+    autotim: autotim,
+    spd: spd,
+    timer: timer,
     lat: lat,
     itr: itr,
     stp: stp,
     pau: pau,
-    
-    spd: spd,
-    spd1: spd1,
     
     cnts: cnts,
     
