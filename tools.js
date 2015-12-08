@@ -1,4 +1,4 @@
-/***** Tools 4.10.2 *****/
+/***** Tools 4.10.3 *****/
 
 (function (udf){
   var nodep = typeof window === "undefined";
@@ -1917,9 +1917,11 @@
     if (udfp(oc))return e;
     if (objp(oc)){
       satr(e, oc);
-      return att(e, sli(arguments, 2));
+      att(e, sli(arguments, 2));
+      return e;
     }
-    return att(e, sli(arguments, 1));
+    att(e, sli(arguments, 1));
+    return e;
   }
   
   function elm1(a){
