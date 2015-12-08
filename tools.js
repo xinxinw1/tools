@@ -1,4 +1,4 @@
-/***** Tools 4.9.1 *****/
+/***** Tools 4.10.0 *****/
 
 (function (udf){
   var nodep = typeof window === "undefined";
@@ -401,7 +401,7 @@
     }
     if (htmp(a)){
       var b = ref(a, n);
-      if (udfp(b))return att(x, a);
+      if (udfp(b))return att(a, x);
       a.insertBefore(x, b);
       return a;
     }
@@ -1114,7 +1114,7 @@
   
   function nofArr(n, a){
     var r = [];
-    for (var i = n; i >= 1; i--)att(a, r);
+    for (var i = n; i >= 1; i--)att(r, a);
     return r;
   }
   
@@ -1466,29 +1466,38 @@
   
   //// Other ////
   
-  function att(x, a){
+  function att1(a, x){
     if (arrp(a)){
       man1(function (x){
         push(x, a);
       })(x);
-      return a;
+      return;
     }
     if (objp(a) || fnp(a)){
-      if (arrp(x))return att(tobj(x), a);
+      if (arrp(x)){
+        att1(a, tobj(x));
+        return;
+      }
       if (objp(x) || fnp(x)){
         for (var i in x){
           a[i] = x[i];
         }
-        return a;
+        return;
       }
     }
     if (htmp(a)){
       man1(function (x){
         a.appendChild(htm(x));
       })(x);
-      return a;
+      return;
     }
-    err(att, "Can't attach x = $1 to a = $2", x, a);
+    err(att1, "Can't attach x = $1 to a = $2", x, a);
+  }
+  
+  function att(a){
+    each(sli(arguments, 1), function (x){
+      att1(a, x);
+    });
   }
   
   ////// Object and alist //////
@@ -1907,9 +1916,9 @@
     if (udfp(oc))return e;
     if (objp(oc)){
       satt(e, oc);
-      return att(sli(arguments, 2), e);
+      return att(e, sli(arguments, 2));
     }
-    return att(sli(arguments, 1), e);
+    return att(e, sli(arguments, 1));
   }
   
   function elm1(a){
@@ -1920,7 +1929,7 @@
     return doc.createTextNode(a);
   }
   
-  function atts(a){
+  function atrs(a){
     var o = {};
     each(a.attributes, function (x){
       if (x.specified)o[x.name] = x.valsue;
@@ -1931,20 +1940,18 @@
     return o;
   }
   
-  function satt(a, x, y){
+  function satr(a, x, y){
     man2(function (x, y){
       if (beg(x, "on"))a[x] = y;
       else a.setAttribute(x, y);
     })(x, y);
-    return a;
   }
   
-  function ratt(a, x){
+  function ratr(a, x){
     man1(function (x){
       if (beg(x, "on"))a[x] = null;
       else a.removeAttribute(x);
     })(x);
-    return a;
   }
   
   function kids(a){
@@ -1952,32 +1959,24 @@
   }
   
   function cont(x){
-    var a = sli(arguments, 1);
     clr(x);
-    each(a, function (a){
-      return att(htm(a), x);
-    });
-    return x;
+    att(x, sli(arguments, 1));
   }
   
   function top(a){
     a.scrollTop = 0;
-    return a;
   }
   
   function bot(a){
     a.scrollTop = a.scrollHeight;
-    return a;
   }
   
   function foc(a){
     a.focus();
-    return a;
   }
   
-  function atth(x, a){
+  function atth(a, x){
     a.innerHTML += x;
-    return a;
   }
   
   function seth(a, x){
@@ -2244,7 +2243,7 @@
   
   ////// Object exposure //////
   
-  att({
+  att($, {
     nodep: nodep,
     udf: udf,
     win: win,
@@ -2406,6 +2405,7 @@
     ushf: ushf,
     shf: shf,
     
+    att1: att1,
     att: att,
     
     keys: keys,
@@ -2445,9 +2445,9 @@
     elms: elms,
     elm: elm,
     txt: txt,
-    atts: atts,
-    satt: satt,
-    ratt: ratt,
+    atrs: atrs,
+    satr: satr,
+    ratr: ratr,
     kids: kids,
     cont: cont,
     top: top,
@@ -2490,7 +2490,7 @@
     do1: do1,
     exit: exit,
     evl: evl
-  }, $);
+  });
   
   if (nodep)module.exports = $;
   else win.$ = $;
