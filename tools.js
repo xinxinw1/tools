@@ -1,4 +1,4 @@
-/***** Tools 4.10.0 *****/
+/***** Tools 4.10.1 *****/
 
 (function (udf){
   var nodep = typeof window === "undefined";
@@ -365,6 +365,7 @@
     if (htmp(a))return a;
     if (strp(a))return txt(a);
     if (arrp(a))return apl(elm, a);
+    if (udfp(a))return txt("");
     return htm(dsp(a));
   }
   
