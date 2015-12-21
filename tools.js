@@ -1,4 +1,4 @@
-/***** Tools 4.10.3 *****/
+/***** Tools 4.11.0 *****/
 
 (function (udf){
   var nodep = typeof window === "undefined";
@@ -146,28 +146,35 @@
     return a !== b;
   }
   
-  function iso(a, b){
+  function iso(a, b, f){
+    if (udfp(f))f = is;
     if (is(a, b))return true;
-    if (arrp(a) && arrp(b))return isoArr(a, b);
-    if (objp(a) && objp(b))return isoObj(a, b);
-    if (rgxp(a) && rgxp(b))return isoRgx(a, b);
+    if (arrp(a) && arrp(b))return isoArr(a, b, f);
+    if (objp(a) && objp(b))return isoObj(a, b, f);
+    if (rgxp(a) && rgxp(b))return isoRgx(a, b, f);
     return false;
   }
   
-  function isoArr(a, b){
+  function deepiso(a, b){
+    return iso(a, b, deepiso);
+  }
+  
+  function isoArr(a, b, f){
+    if (udfp(f))f = is;
     if (len(a) != len(b))return false;
     for (var i = 0; i < len(a); i++){
-      if (!is(a[i], b[i]))return false;
+      if (!f(a[i], b[i]))return false;
     }
     return true;
   }
   
-  function isoObj(a, b){
+  function isoObj(a, b, f){
+    if (udfp(f))f = is;
     for (var i in a){
-      if (!is(a[i], b[i]))return false;
+      if (!f(a[i], b[i]))return false;
     }
     for (var i in b){
-      if (!is(a[i], b[i]))return false;
+      if (!f(a[i], b[i]))return false;
     }
     return true;
   }
@@ -2278,6 +2285,7 @@
     is: is,
     isn: isn,
     iso: iso,
+    deepiso: deepiso,
     isoArr: isoArr,
     isoObj: isoObj,
     isoRgx: isoRgx,
