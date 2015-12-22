@@ -1,4 +1,4 @@
-/***** Tools 4.11.0 *****/
+/***** Tools 4.12.0 *****/
 
 (function (udf){
   var nodep = typeof window === "undefined";
@@ -223,6 +223,7 @@
     }
     if (strp(a))return dspStr(a);
     if (fnp(a))return sig(a);
+    if (T.tagp(a))return dspTag(a);
     if (objp(a)){
       if (L.has(a, L.cdr(ds)))return "{...}";
       return dspObj(a);
@@ -259,6 +260,17 @@
       push(i + ": " + dsp(a[i]), r);
     }
     return "{" + joi(r, ", ") + "}";
+  }
+  
+  var dspfns = {};
+  function addDspFn(t, f){
+    dspfns[t] = f;
+  }
+  
+  function dspTag(a){
+    var f = dspfns[a.type];
+    if (udfp(f))return dspObj(a);
+    return f(a);
   }
   
   function dmp(a){
@@ -2297,6 +2309,8 @@
     dsp: dsp,
     dspStr: dspStr,
     dspObj: dspObj,
+    addDspFn: addDspFn,
+    dspTag: dspTag,
     dmp: dmp,
     
     ou: ou,
