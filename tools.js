@@ -1,4 +1,4 @@
-/***** Tools 4.12.0 *****/
+/***** Tools 4.12.1 *****/
 
 (function (udf){
   var nodep = typeof window === "undefined";
@@ -1666,14 +1666,27 @@
     return apl(a, sliArr(arguments, 1));
   }
   
+  function orig(f){
+    if (!udfp(f.forig))return f.forig;
+    return f;
+  }
+  
+  function worig(forig, fnew){
+    if (!udfp(forig.forig))forig = forig.forig;
+    fnew.forig = forig;
+    return fnew;
+  }
+  
   // function test(a, b, c) -> "test"
   function nam(a){
+    a = orig(a);
     var n = cap(/function\s*([^\(]*)\(([^\)]*)\)/, dmp(a));
     return (n[0] == "")?"function":n;
   }
   
   // function test(a, b, c) -> "test(a, b, c)"
   function sig(a){
+    a = orig(a);
     var n = cap(/function\s*([^\(]*\(([^\)]*)\))/, dmp(a));
     return (n[0] == "(")?"function" + n:n;
   }
@@ -1681,6 +1694,7 @@
   // http://stackoverflow.com/a/1357494
   // function test(a, b, c) -> ["a", "b", "c"]
   function prms(a){
+    a = orig(a);
     var p = cap(/function[^\(]*\(([^\)]*)\)/, dmp(a));
     p = spl(p, /\s*,\s*/);
     return (p[0] == "")?[]:p;
@@ -1688,9 +1702,9 @@
   
   // combine/compose
   function cmb(a, b){
-    return function (){
+    return wforig(b, function (){
       return a(apl(b, arguments));
-    };
+    });
   }
   
   function man1(f){
@@ -2454,6 +2468,8 @@
     stf: stf,
     
     call: call,
+    orig: orig,
+    worig: worig,
     nam: nam,
     sig: sig,
     prms: prms,
