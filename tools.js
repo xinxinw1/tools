@@ -1,4 +1,4 @@
-/***** Tools 4.12.1 *****/
+/***** Tools *****/
 
 (function (udf){
   var nodep = typeof window === "undefined";
@@ -1280,7 +1280,7 @@
   //// Array ////
   
   function head(x, a){
-    return ush(x, cpy(a));
+    return ushf(x, cpy(a));
   }
   
   function tail(a, x){
