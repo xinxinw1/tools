@@ -25,32 +25,6 @@
     return Object.prototype.toString.call(a);
   }
   
-  function typ(a){
-    if (a instanceof Node)return "htm";
-    if (a instanceof Err)return "err";
-    var tp = cls(a);
-    switch (tp){
-      case "[object Object]": return "obj";
-      case "[object String]": return "str";
-      case "[object Number]": return "num";
-      case "[object Array]": return "arr";
-      case "[object Arguments]":
-      case "[object HTMLCollection]":
-      case "[object NodeList]": 
-      case "[object NamedNodeMap]":
-      case "[object MozNamedAttrMap]": return "irr";
-      case "[object Function]": return "fn";
-      case "[object Undefined]": return "udf";
-      case "[object Boolean]": return "bol";
-      case "[object RegExp]": return "rgx";
-      case "[object Null]": return "nul";
-      case "[object Window]": return "win";
-      case "[object HTMLDocument]": return "doc";
-      case "[object Text]": return "txt";
-    }
-    return tp;
-  }
-  
   //// Predicates ////
   
   function nump(a){
@@ -196,48 +170,52 @@
     return false;
   }
   
-  ////// Dynamic vars //////
-  
-  function sta(a, x, f){
-    L.push(x, a);
-    var r = f();
-    L.pop(a);
-    return r;
-  }
-  
   ////// Display //////
   
-  var ds = [];
-  function dsp(a){
-    return sta(ds, a, function (){
-      return dsp1(a);
+  function dsp(a, dspFn, dspSta){
+    if (udfp(dspFn))dspFn = dsp;
+    if (udfp(dspSta))dspSta = nil();
+    return sta(dspSta, a, function (){
+      return dsp1(a, dspFn, dspSta);
     });
   }
   
-  function dsp1(a){
+  function dsp1(a, dsp, dspSta){
+    if (tagp(a))return dspTag(a, dsp, dspSta);
+    return dspSimp1(a, dsp, dspSta);
+  }
+  
+  function dspSimp(a, dsp, dspSta){
+    if (udfp(dsp))dsp = dspSimp;
+    if (udfp(dspSta))dspSta = nil();
+    return sta(dspSta, a, function (){
+      return dspSimp1(a, dsp, dspSta);
+    });
+  }
+  
+  function dspSimp1(a, dsp, dspSta){
     if (udfp(a))return "udf";
     if (nulp(a))return "null";
     if (arrp(a) || irrp(a)){
-      if (L.has(a, L.cdr(ds)))return "[...]";
-      return "[" + joi(map(dsp, a), ", ") + "]";
+      if (inPrevDsp(a, dspSta))return "[...]";
+      return "[" + joi(map(function (a){return dsp(a, dsp, dspSta);}, a), ", ") + "]";
     }
     if (strp(a))return dspStr(a);
     if (fnp(a))return sig(a);
-    if (T.tagp(a))return dspTag(a);
     if (objp(a)){
-      if (L.has(a, L.cdr(ds)))return "{...}";
-      return dspObj(a);
+      if (inPrevDsp(a, dspSta))return "{...}";
+      return dspObj(a, dsp, dspSta);
     }
     if (winp(a))return "win";
     if (docp(a))return "doc";
     if (htmp(a)){
-      if (txtp(a))return "<txt " + dsp(a.data) + ">";
+      if (txtp(a))return "<txt " + dsp(a.data, dsp, dspSta) + ">";
       if (!udfp(a.tagName)){
         var s = "<" + low(a.tagName);
         var t = atts(a);
-        if (!emp(t))s += " " + dsp(t);
+        if (!emp(t))s += " " + dsp(t, dsp, dspSta);
         s += fold(function (s, x){
-          return s + " " + dsp(x);
+          return s + " " + dsp(x, dsp, dspSta);
         }, "", a);
         s += ">";
         return s;
@@ -248,33 +226,286 @@
   
   // (var to (map [+ "\\" _] #["\\", "\"", "n", "r", "t", "b", "f"]))
   function dspStr(a){
-    var fr = ["\\", "\"", "\n", "\r", "\t", "\b", "\f"];
-    var to = ["\\\\", "\\\"", "\\n", "\\r", "\\t", "\\b", "\\f"];
-    return "\"" + rpl(fr, to, a) + "\"";
+    if (JSON.stringify){
+      return JSON.stringify(a);
+    } else {
+      var fr = ["\\", "\"", "\n", "\r", "\t", "\b", "\f"];
+      var to = ["\\\\", "\\\"", "\\n", "\\r", "\\t", "\\b", "\\f"];
+      return "\"" + rpl(fr, to, a) + "\"";
+    }
   }
   
   // can't use fold because dspObj is used on fns and arrs too
-  function dspObj(a){
+  function dspObj(a, dsp, dspSta){
     var r = [];
     for (var i in a){
-      push(i + ": " + dsp(a[i]), r);
+      push(i + ": " + dsp(a[i], dsp, dspSta), r);
     }
     return "{" + joi(r, ", ") + "}";
   }
   
   var dspfns = {};
-  function addDspFn(t, f){
+  function setDspFn(t, f){
     dspfns[t] = f;
   }
   
-  function dspTag(a){
+  function inPrevDsp(a, dspSta){
+    return hasLis(a, cdr(dspSta));
+  }
+  
+  function dspTag(a, dsp, dspSta){
     var f = dspfns[a.type];
-    if (udfp(f))return dspObj(a);
-    return f(a);
+    if (udfp(f))return dspObj(a, dsp, dspSta);
+    return f(a, dsp, dspSta);
   }
   
   function dmp(a){
     return String(a);
+  }
+  
+  ////// Lisp Type //////
+  
+  function typ(a){
+    return a.type;
+  }
+  
+  function tag(a, x, y){
+    return a[x] = y;
+  }
+  
+  function rep(a, x){
+    return a[x];
+  }
+  
+  // detach
+  function det(a, x){
+    var r = a[x];
+    delete a[x];
+    return r;
+  }
+  
+  function dat(a){
+    return a.data;
+  }
+  
+  function sdat(a, x){
+    return a.data = x;
+  }
+  
+  //// Builders ////
+  
+  function mk(t, o){
+    if (udfp(o))return {type: t};
+    return app(o, {type: t});
+  }
+  
+  function mkdat(t, d, o){
+    if (udfp(o))return {type: t, data: d};
+    return app(o, {type: t, data: d});
+  }
+  
+  function mkbui(t){
+    return function (a){
+      return mkdat(t, a);
+    };
+  }
+  
+  //// Predicates ////
+  
+  function isa(t, a){
+    return a.type === t;
+  }
+  
+  function isany(t){
+    var a = arguments;
+    for (var i = 1; i < a.length; i++){
+      if (isa(t, a[i]))return true;
+    }
+    return false;
+  }
+  
+  function typin(a){
+    var tp = typ(a);
+    var t = arguments;
+    for (var i = 1; i < t.length; i++){
+      if (tp === t[i])return true;
+    }
+    return false;
+  }
+  
+  // return isa(t, a);
+  function mkpre(t){
+    return function (a){
+      return a.type === t;
+    };
+  }
+  
+  // !!a to deal with null and undefined inputs
+  function tagp(a){
+    return !!a && a.type !== udf;
+  }
+  
+  ////// Lists //////
+  
+  function car(a){
+    return (a.car === udf)?nil():a.car;
+  }
+  
+  function cdr(a){
+    return (a.cdr === udf)?nil():a.cdr;
+  }
+  
+  function cons(a, b){
+    return {type: "lis", car: a, cdr: b};
+  }
+  
+  function nil(){
+    return {type: "nil"};
+  }
+  
+  function scar(a, x){
+    return a.car = x;
+  }
+  
+  function scdr(a, x){
+    return a.cdr = x;
+  }
+  
+  function lis(){
+    var a = arguments;
+    var r = nil();
+    for (var i = a.length-1; i >= 0; i--){
+      r = cons(a[i], r);
+    }
+    return r;
+  }
+  
+  function lisd(){
+    var a = arguments;
+    if (a.length === 0)return nil();
+    var r = a[a.length-1];
+    for (var i = a.length-2; i >= 0; i--){
+      r = cons(a[i], r);
+    }
+    return r;
+  }
+  
+  //// cxr ////
+  
+  function caar(a){
+    return car(car(a));
+  }
+  
+  function cadr(a){
+    return car(cdr(a));
+  }
+  
+  function cdar(a){
+    return cdr(car(a));
+  }
+  
+  function cddr(a){
+    return cdr(cdr(a));
+  }
+  
+  //// Simplified Lisp Functions ////
+  
+  function pushLis(x, a){
+    switch (typ(a)){
+      case "nil":
+        tag(a, "type", "lis");
+        tag(a, "car", x);
+        tag(a, "cdr", nil());
+        return a;
+      case "lis":
+        scdr(a, cons(car(a), cdr(a)));
+        scar(a, x);
+        return a;
+    }
+    err(pushLis, "Can't push x = $1 onto a = $2", x, a);
+  }
+  
+  function popLis(a){
+    switch (typ(a)){
+      case "nil": return nil();
+      case "lis":
+        var x = car(a);
+        if (nilp(cdr(a))){
+          tag(a, "type", "nil");
+          det(a, "car");
+          det(a, "cdr");
+        } else {
+          scar(a, cadr(a));
+          scdr(a, cddr(a));
+        }
+        return x;
+    }
+    err(popLis, "Can't pop from a = $1", a);
+  }
+  
+  function isLis(a, b){
+    return a === b || nilp(a) && nilp(b);
+  }
+  
+  function jbnLis(a){
+    if (fnp(a))return a;
+    return function (x){
+      return isLis(x, a);
+    };
+  }
+  
+  function hasLis(x, a){
+    return hasLisFn(jbnLis(x), a);
+  }
+  
+  function hasLisFn(x, a){
+    if (nilp(a))return false;
+    if (x(car(a)))return a;
+    return hasLis(x, cdr(a));
+  }
+  
+  //// Predicates ////
+  
+  var nilp = mkpre("nil");
+  var lisp = mkpre("lis");
+  
+  function atmp(a){
+    return !lisp(a);
+  }
+  
+  //// Display Fn ////
+  
+  setDspFn("nil", function (a){
+    return "nil";
+  });
+  
+  setDspFn("lis", function (a, dsp, dspSta){
+    if (inPrevDsp(a, dspSta))return "(...)";
+    return "(" + dlis(a, dsp, dspSta) + ")";
+  });
+  
+  function dlis(a, dsp, dspSta, dlisSta){
+    if (udfp(dlisSta))dlisSta = nil();
+    return sta(dlisSta, a, function (){
+      return dlis1(a, dsp, dspSta, dlisSta);
+    });
+  }
+  
+  // dlis1( '(1 2 3 4 . 5) ) -> "1 2 3 4 . 5"
+  function dlis1(a, dsp, dspSta, dlisSta){
+    if (inPrevDsp(a, dlisSta))return ". (...)";
+    if (nilp(cdr(a)))return dsp(car(a), dsp, dspSta);
+    if (atmp(cdr(a)))return dsp(car(a), dsp, dspSta) + " . " + dsp(cdr(a), dsp, dspSta);
+    return dsp(car(a), dsp, dspSta) + " " + dlis(cdr(a), dsp, dspSta, dlisSta);
+  }
+  
+  ////// Dynamic vars //////
+  
+  function sta(a, x, f){
+    pushLis(x, a);
+    var r = f();
+    popLis(a);
+    return r;
   }
   
   ////// Output //////
@@ -1287,6 +1518,11 @@
     return push(x, cpy(a));
   }
   
+  function arrd(){
+    var r = but(arguments);
+    return app(r, las(arguments));
+  }
+  
   //// Other ////
   
   // afta(a, x)
@@ -1732,207 +1968,6 @@
     return a;
   }
   
-  ////// List //////
-  
-  var L = (function (){
-    //// Predicates ////
-    
-    function nilp(a){
-      return a.length == 0;
-    }
-    
-    //// Basic ////
-    
-    function car(a){
-      return (a[0] !== udf)?a[0]:[];
-    }
-    
-    function cdr(a){
-      return (a[1] !== udf)?a[1]:[];
-    }
-    
-    function cons(a, b){
-      return [a, b];
-    }
-    
-    //// car and cdr extensions ////
-    
-    function caar(a){
-      return car(car(a));
-    }
-    
-    function cadr(a){
-      return car(cdr(a));
-    }
-    
-    function cdar(a){
-      return cdr(car(a));
-    }
-    
-    function cddr(a){
-      return cdr(cdr(a));
-    }
-    
-    //// General ////
-    
-    function has(x, a){
-      if (nilp(a))return false;
-      if (is(car(a), x))return true;
-      return has(x, cdr(a));
-    }
-    
-    function is(a, b){
-      return a === b || nilp(a) && nilp(b);
-    }
-    
-    function push(x, a){
-      if (nilp(a)){
-        a[1] = [];
-        a[0] = x;
-        return a;
-      }
-      a[1] = cons(a[0], a[1]);
-      a[0] = x;
-      return a;
-    }
-    
-    function pop(a){
-      var x = a[0];
-      if (nilp(a[1])){
-        a.pop();
-        a.pop();
-      } else {
-        a[0] = a[1][0]; // cadr(a);
-        a[1] = a[1][1]; // cddr(a);
-      }
-      return x;
-    }
-    
-    //// Object exposure ////
-    
-    return {
-      nilp: nilp,
-      
-      car: car,
-      cdr: cdr,
-      cons: cons,
-      
-      caar: caar,
-      cdar: cdar,
-      cadr: cadr,
-      cddr: cddr,
-      
-      has: has,
-      is: is,
-      push: push,
-      pop: pop
-    };
-  })();
-  
-  ////// Lisp Type //////
-  
-  var T = (function (){
-    function typ(a){
-      return a.type;
-    }
-    
-    function tag(a, x, y){
-      return a[x] = y;
-    }
-    
-    // n is probably never going to be greater than js int size
-    function rep(a, x){
-      return a[x];
-    }
-    
-    // detach
-    function det(a, x){
-      var r = a[x];
-      delete a[x];
-      return r;
-    }
-    
-    function dat(a){
-      return a.data;
-    }
-    
-    function sdat(a, x){
-      return a.data = x;
-    }
-    
-    //// Builders ////
-    
-    function mk(t, o){
-      if (udfp(o))return {type: t};
-      return app(o, {type: t});
-    }
-    
-    function mkdat(t, d, o){
-      if (udfp(o))return {type: t, data: d};
-      return app(o, {type: t, data: d});
-    }
-    
-    function mkbui(t){
-      return function (a){
-        return mkdat(t, a);
-      };
-    }
-    
-    //// Predicates ////
-    
-    function isa(t, a){
-      return a.type === t;
-    }
-    
-    function isany(t){
-      var a = arguments;
-      for (var i = 1; i < a.length; i++){
-        if (isa(t, a[i]))return true;
-      }
-      return false;
-    }
-    
-    function typin(a){
-      var tp = typ(a);
-      var t = arguments;
-      for (var i = 1; i < t.length; i++){
-        if (tp === t[i])return true;
-      }
-      return false;
-    }
-    
-    // return isa(t, a);
-    function mkpre(t){
-      return function (a){
-        return a.type === t;
-      };
-    }
-    
-    // !!a to deal with null and undefined inputs
-    function tagp(a){
-      return !!a && a.type !== udf;
-    }
-    
-    return {
-      typ: typ,
-      tag: tag,
-      rep: rep,
-      det: det,
-      dat: dat,
-      sdat: sdat,
-      
-      mk: mk,
-      mkdat: mkdat,
-      mkbui: mkbui,
-      
-      isa: isa,
-      isany: isany,
-      typin: typin,
-      mkpre: mkpre,
-      tagp: tagp
-    };
-  })();
-  
   ////// DOM //////
   
   /* Note: these functions won't work in Node.js */
@@ -2218,42 +2253,69 @@
     return r;
   }
   
+  ////// Class /////
+  
+  // http://stackoverflow.com/questions/1382107/whats-a-good-way-to-extend-error-in-javascript
+  function mkclass(sup, con){
+    con.prototype = Object.create(sup.prototype);
+    con.prototype.constructor = con;
+    return con;
+  }
+  
+  function setstatic(cls, name, val){
+    cls.prototype[name] = val;
+  }
+  
+  function setmethod(cls, fn){
+    cls.prototype[fn.name] = fn;
+  }
+  
   ////// Error //////
   
-  function Err(fn, sig, text, data){
+  function mkerr(con){
+    var E = mkclass(Error, function E(){
+      this.context = this.constructor;
+      con.apply(this, arguments);
+      setStack(this, this.context);
+    });
+    setstatic(E, 'name', con.name);
+    setmethod(E, function toString(){
+      return this.name + ": " + this.message;
+    });
+    return E;
+  }
+  
+  function setStack(obj, fn){
+    if (Error.captureStackTrace){
+      Error.captureStackTrace(obj, fn);
+    } else {
+      var err = new Error();
+      obj.stack = err.stack;
+    }
+  }
+  
+  function dspStack(e){
+    if (Error.captureStackTrace){
+      return e.stack;
+    }
+    return e.toString() + "\n" + e.stack;
+  }
+  
+  Err = mkerr(function Error(fn, sig, text, data){
     if (udfp(data))data = {};
-    this.fn = fn;
+    if (!udfp(fn))this.context = fn;
     this.sig = sig;
     this.text = text;
     this.data = data;
+    this.message = this.sig + ": " + this.text;
+  });
+  
+  function err(f){
+    throw new Err(err, sig(f), apl(stf, sli(arguments, 1)));
   }
   
-  Err.prototype.toString = function (){
-    return "Error: " + this.sig + ": " + this.text;
-  };
-  
-  var efn = function (e){};
-  
-  function err(f, o){
-    var e;
-    if (!objp(o))e = new Err(f, sig(f), apl(stf, sli(arguments, 1)));
-    else e = new Err(f, sig(f), apl(stf, sli(arguments, 2)), o);
-    efn(e);
-    throw e.toString();
-  }
-  
-  function err2(f, s){
-    var e = new Err(f, s, apl(stf, sli(arguments, 2)));
-    efn(e);
-    throw e.toString();
-  }
-  
-  function gefn(){
-    return efn;
-  }
-  
-  function sefn(f){
-    return efn = f;
+  function errData(f, o){
+    throw new Err(errData, sig(f), apl(stf, sli(arguments, 2)), o);
   }
   
   ////// Other //////
@@ -2318,14 +2380,50 @@
     
     inp: inp,
     
-    sta: sta,
-    
     dsp: dsp,
+    dspSimp: dspSimp,
     dspStr: dspStr,
     dspObj: dspObj,
-    addDspFn: addDspFn,
+    setDspFn: setDspFn,
     dspTag: dspTag,
     dmp: dmp,
+    
+    typ: typ,
+    tag: tag,
+    rep: rep,
+    det: det,
+    dat: dat,
+    sdat: sdat,
+    
+    mk: mk,
+    mkdat: mkdat,
+    mkbui: mkbui,
+    
+    isa: isa,
+    isany: isany,
+    typin: typin,
+    mkpre: mkpre,
+    tagp: tagp,
+    
+    car: car,
+    cdr: cdr,
+    cons: cons,
+    nil: nil,
+    scar: scar,
+    scdr: scdr,
+    lis: lis,
+    lisd: lisd,
+    
+    caar: caar,
+    cadr: cadr,
+    cdar: cdar,
+    cddr: cddr,
+    
+    nilp: nilp,
+    lisp: lisp,
+    atmp: atmp,
+    
+    sta: sta,
     
     ou: ou,
     out: out,
@@ -2426,6 +2524,7 @@
     
     head: head,
     tail: tail,
+    arrd: arrd,
     
     beg: beg,
     end: end,
@@ -2479,10 +2578,6 @@
     
     self: self,
     
-    L: L,
-    
-    T: T,
-    
     elms: elms,
     elm: elm,
     txt: txt,
@@ -2521,11 +2616,17 @@
     
     cnts: cnts,
     
+    mkclass: mkclass,
+    setstatic: setstatic,
+    setmethod: setmethod,
+    
+    mkerr: mkerr,
+    setStack: setStack,
+    dspStack: dspStack,
+    
     Err: Err,
     err: err,
-    err2: err2,
-    gefn: gefn,
-    sefn: sefn,
+    errData: errData,
     
     rand: rand,
     do1: do1,
