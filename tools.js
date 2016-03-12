@@ -1878,6 +1878,14 @@
     return r;
   }
   
+  function getter(o, k, f){
+    Object.defineProperty(o, k, {get: f});
+  }
+  
+  function setter(o, k, f){
+    Object.defineProperty(o, k, {set: f});
+  }
+  
   ////// String //////
   
   function low(a){
@@ -2561,6 +2569,8 @@
     osetp: osetp,
     odel: odel,
     oren: oren,
+    getter: getter,
+    setter: setter,
     
     low: low,
     upp: upp,
