@@ -1976,6 +1976,14 @@
     return a;
   }
   
+  //// Gensym ////
+  
+  var gsn = 0;
+
+  function gs(){
+    return gsn++;
+  }
+  
   ////// DOM //////
   
   /* Note: these functions won't work in Node.js */
@@ -2587,6 +2595,8 @@
     man2: man2,
     
     self: self,
+    
+    gs: gs,
     
     elms: elms,
     elm: elm,
