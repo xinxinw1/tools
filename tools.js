@@ -2286,7 +2286,7 @@
   
   function itr(f, n){
     if (udfp(n))n = 0;
-    return setIntervals(f, n);
+    return setInterval(f, n);
   }
   
   function stp(a){
