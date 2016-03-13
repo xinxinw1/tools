@@ -1922,6 +1922,32 @@
     return best(function (a, b){return a > b;}, arguments);
   }
   
+  function avgcol(){
+    var avg;
+    var n = 0;
+    
+    function add(a){
+      if (udfp(avg))avg = a;
+      avg = n/(n+1)*avg + a/(n+1);
+      n++;
+    }
+    
+    function getavg(){
+      return avg;
+    }
+    
+    function reset(){
+      avg = udf;
+      n = 0;
+    }
+    
+    return {
+      add: add,
+      getavg: getavg,
+      reset: reset
+    };
+  }
+  
   ////// Function //////
   
   function call(a){
@@ -2683,6 +2709,7 @@
     stf: stf,
     
     max: max,
+    avgcol: avgcol,
     
     call: call,
     orig: orig,
