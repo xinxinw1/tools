@@ -347,20 +347,20 @@
   
   ////// Lists //////
   
-  function car(a){
-    return (a.car === udf)?nil():a.car;
-  }
-  
-  function cdr(a){
-    return (a.cdr === udf)?nil():a.cdr;
-  }
-  
   function cons(a, b){
     return {type: "lis", car: a, cdr: b};
   }
   
   function nil(){
     return {type: "nil"};
+  }
+  
+  function car(a){
+    return (a.car === udf)?nil():a.car;
+  }
+  
+  function cdr(a){
+    return (a.cdr === udf)?nil():a.cdr;
   }
   
   function scar(a, x){
@@ -479,33 +479,37 @@
     return "nil";
   });
   
-  setDspFn("lis", function (a, dsp, dspSta){
-    if (inPrevDsp(a, dspSta))return "(...)";
-    return "(" + dlis(a, dsp, dspSta) + ")";
-  });
+  setDspFn("lis", dspLis);
   
-  function dlis(a, dsp, dspSta, dlisSta){
-    if (udfp(dlisSta))dlisSta = nil();
-    return sta(dlisSta, a, function (){
-      return dlis1(a, dsp, dspSta, dlisSta);
+  function dspLis(a, dsp, dspSta){
+    if (inPrevDsp(a, dspSta))return "(...)";
+    return "(" + dspLisInner(a, dsp, dspSta) + ")";
+  }
+  
+  function dspLisInner(a, dsp, dspSta, dspLisSta){
+    if (udfp(dspLisSta))dspLisSta = nil();
+    return sta(dspLisSta, a, function (){
+      return dspLisInner1(a, dsp, dspSta, dspLisSta);
     });
   }
   
   // dlis1( '(1 2 3 4 . 5) ) -> "1 2 3 4 . 5"
-  function dlis1(a, dsp, dspSta, dlisSta){
-    if (inPrevDsp(a, dlisSta))return ". (...)";
+  function dspLisInner1(a, dsp, dspSta, dspLisSta){
+    if (inPrevDsp(a, dspLisSta))return ". (...)";
     if (nilp(cdr(a)))return dsp(car(a), dsp, dspSta);
     if (atmp(cdr(a)))return dsp(car(a), dsp, dspSta) + " . " + dsp(cdr(a), dsp, dspSta);
-    return dsp(car(a), dsp, dspSta) + " " + dlis(cdr(a), dsp, dspSta, dlisSta);
+    return dsp(car(a), dsp, dspSta) + " " + dspLisInner(cdr(a), dsp, dspSta, dspLisSta);
   }
   
   ////// Dynamic vars //////
   
   function sta(a, x, f){
     pushLis(x, a);
-    var r = f();
-    popLis(a);
-    return r;
+    try {
+      return f();
+    } finally {
+      popLis(a);
+    }
   }
   
   ////// Output //////
@@ -1990,9 +1994,15 @@
   
   // combine/compose
   function cmb(a, b){
-    return wforig(b, function (){
+    return worig(b, function (){
       return a(apl(b, arguments));
     });
+  }
+  
+  function negf(a){
+    return function (){
+      return !apl(a, arguments);
+    };
   }
   
   function man1(f){
@@ -2366,6 +2376,12 @@
     while (c-d < t);
   }
   
+  ////// Checkers //////
+  
+  function chkeven(a){
+    if (len(a) % 2 != 0)err(chkeven, "a = $1 must have even length", a);
+  }
+  
   ////// Debug //////
   
   // cnts([1, 2, 1, 3, 4, 5, 5, 6])
@@ -2524,6 +2540,7 @@
     dspStr: dspStr,
     dspObj: dspObj,
     setDspFn: setDspFn,
+    inPrevDsp: inPrevDsp,
     dspTag: dspTag,
     dmp: dmp,
     
@@ -2563,6 +2580,8 @@
     atmp: atmp,
     
     sta: sta,
+    
+    dspLis: dspLis,
     
     ou: ou,
     out: out,
@@ -2718,6 +2737,7 @@
     sig: sig,
     prms: prms,
     cmb: cmb,
+    negf: negf,
     man1: man1,
     man2: man2,
     everyn: everyn,
@@ -2763,6 +2783,8 @@
     itr: itr,
     stp: stp,
     pau: pau,
+    
+    chkeven: chkeven,
     
     cnts: cnts,
     
