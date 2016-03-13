@@ -2355,6 +2355,12 @@
     })(a);
   }
   
+  function change(name){
+    if (udfp(name))name = "T";
+    win.$ = old$;
+    win[name] = $;
+  }
+  
   ////// Object exposure //////
   
   att($, {
@@ -2652,8 +2658,11 @@
     rand: rand,
     do1: do1,
     exit: exit,
-    evl: evl
+    evl: evl,
+    change: change
   });
+  
+  var old$ = win.$;
   
   if (nodep)module.exports = $;
   else win.$ = $;
