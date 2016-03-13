@@ -1130,6 +1130,18 @@
     err(cnt, "Can't count number of x = $1 in a = $2", x, a);
   }
   
+  function best(f, a){
+    var m = null;
+    for (var i = 0; i < a.length; i++){
+      if (m === null){
+        m = a[i];
+      } else {
+        if (f(a[i], m))m = a[i];
+      }
+    }
+    return m;
+  }
+  
   //// Whole ////
   
   function len(a){
@@ -2575,6 +2587,7 @@
     mat: mat,
     mats: mats,
     cnt: cnt,
+    best: best,
     
     len: len,
     len_: len_,
