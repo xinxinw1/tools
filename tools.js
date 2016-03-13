@@ -1922,8 +1922,30 @@
   
   ////// Number //////
   
+  function lt(a, b){
+    return a < b;
+  }
+  
+  function le(a, b){
+    return a <= b;
+  }
+  
+  function gt(a, b){
+    return a > b;
+  }
+  
+  function ge(a, b){
+    return a >= b;
+  }
+  
+  function compare(cf, af){
+    return function (a, b){
+      return cf(af(a), af(b));
+    };
+  }
+  
   function max(){
-    return best(function (a, b){return a > b;}, arguments);
+    return best(gt, arguments);
   }
   
   function avgcol(){
@@ -1943,6 +1965,33 @@
     function reset(){
       avg = null;
       n = 0;
+    }
+    
+    return {
+      add: add,
+      get: get,
+      reset: reset
+    };
+  }
+  
+  function medcol(f){
+    if (udfp(f))f = lt;
+    
+    var arr = [];
+    
+    function add(a){
+      insort(f, a, arr);
+    }
+    
+    function get(){
+      if (arr.length === 0)return null;
+      var n = (arr.length-1)/2;
+      if (Number.isInteger(n))return arr[n];
+      return (arr[n-0.5]+arr[n+0.5])/2;
+    }
+    
+    function reset(){
+      arr = [];
     }
     
     return {
@@ -2059,9 +2108,7 @@
   }
   
   function insortasc(x, a){
-    insort(function (a, b){
-      return a < b;
-    }, x, a);
+    insort(lt, x, a);
   }
   
   //// Reference ////
@@ -2745,8 +2792,14 @@
     upp: upp,
     stf: stf,
     
+    lt: lt,
+    le: le,
+    gt: gt,
+    ge: ge,
+    compare: compare,
     max: max,
     avgcol: avgcol,
+    medcol: medcol,
     
     call: call,
     orig: orig,

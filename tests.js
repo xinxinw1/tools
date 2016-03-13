@@ -83,9 +83,10 @@ QUnit.test("insort", function (assert){
   var a, f;
   
   a = [];
-  f = function (a, b){
-    return a.length > b.length;
-  };
+  
+  function getlength(a){return a.length;}
+  
+  f = $.compare($.gt, getlength);
   
   $.insort(f, "test", a);
   assert.same(a, ["test"], $.iso);
@@ -97,9 +98,7 @@ QUnit.test("insort", function (assert){
   assert.same(a, ["wefef", "abcd", "test", "a"], $.iso);
   
   a = [];
-  f = function (a, b){
-    return a.length >= b.length;
-  };
+  f = $.compare($.ge, getlength);
   
   $.insort(f, "test", a);
   assert.same(a, ["test"], $.iso);
@@ -121,6 +120,25 @@ QUnit.test("insort", function (assert){
   assert.same(a, [2, 3, 3, 5], $.iso);
   $.insortasc(1, a);
   assert.same(a, [1, 2, 3, 3, 5], $.iso);
+  
+});
+
+
+QUnit.test("medcol", function (assert){
+  var c;
+  
+  c = $.medcol();
+  assert.same(c.get(), null);
+  c.add(2);
+  assert.same(c.get(), 2);
+  c.add(3);
+  assert.same(c.get(), 2.5);
+  c.add(3);
+  assert.same(c.get(), 3);
+  c.add(-5);
+  assert.same(c.get(), 2.5);
+  c.add(200);
+  assert.same(c.get(), 3);
   
 });
 
