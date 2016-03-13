@@ -212,7 +212,7 @@
       if (txtp(a))return "<txt " + dsp(a.data, dsp, dspSta) + ">";
       if (!udfp(a.tagName)){
         var s = "<" + low(a.tagName);
-        var t = atts(a);
+        var t = atrs(a);
         if (!emp(t))s += " " + dsp(t, dsp, dspSta);
         s += fold(function (s, x){
           return s + " " + dsp(x, dsp, dspSta);
