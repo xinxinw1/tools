@@ -16,3 +16,21 @@ QUnit.test("max", function (assert){
   assert.same($.max(), null);
 });
 
+QUnit.test("avgcol", function (assert){
+  var c = $.avgcol();
+  assert.same(c.getavg(), udf);
+  c.add(5);
+  assert.same(c.getavg(), 5);
+  c.add(4);
+  assert.same(c.getavg(), 4.5);
+  c.add(3);
+  assert.same(c.getavg(), 4);
+  c.reset();
+  assert.same(c.getavg(), udf);
+  c.add(5);
+  assert.same(c.getavg(), 5);
+  c.add(4);
+  assert.same(c.getavg(), 4.5);
+  c.add(3);
+  assert.same(c.getavg(), 4);
+});
