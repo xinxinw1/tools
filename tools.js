@@ -2620,6 +2620,7 @@
     cap: cap,
     caps: caps,
     
+    currtim: currtim,
     tim1: tim1,
     tim: tim,
     ntim: ntim,
