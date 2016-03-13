@@ -1970,6 +1970,28 @@
     };
   }
   
+  function everyn(n, f){
+    var curr = 1;
+    
+    function check(){
+      if (curr >= n){
+        f();
+        curr = 1;
+      } else {
+        curr++;
+      }
+    }
+    
+    function reset(){
+      curr = 1;
+    }
+    
+    return {
+      check: check,
+      reset: reset
+    };
+  }
+  
   //// Reference ////
   
   function self(a){
@@ -2650,6 +2672,7 @@
     cmb: cmb,
     man1: man1,
     man2: man2,
+    everyn: everyn,
     
     self: self,
     
