@@ -2115,6 +2115,57 @@
     return {add: add};
   }
   
+  function stysheet(){
+    att(document.body, elm('style'));
+    return las(document.styleSheets);
+  }
+  
+  function sty(){
+    var style = stysheet();
+    var rules = style.cssRules?style.cssRules:style.rules;
+    
+    var n = 0;
+    
+    function push(rule){
+      style.insertRule(rule, 0);
+      n++;
+    }
+    
+    function get(i){
+      return rules[n-1-i];
+    }
+    
+    function has(i){
+      return !udfp(get(i));
+    }
+    
+    function set(i, rule){
+      if (has(i))del(i);
+      ins(i, rule);
+    }
+    
+    function ins(i, rule){
+      style.insertRule(rule, n-i);
+      n++;
+    }
+    
+    function del(i){
+      style.deleteRule(n-1-i);
+      n--;
+    }
+    
+    return {
+      push: push,
+      get: get,
+      has: has,
+      set: set,
+      ins: ins,
+      del: del,
+      style: style,
+      get length(){return n;}
+    };
+  }
+  
   ////// File //////
   
   /* Note: these functions only work in Node.js */
@@ -2618,6 +2669,7 @@
     atth: atth,
     seth: seth,
     his: his,
+    sty: sty,
     
     rea: rea,
     lns: lns,
