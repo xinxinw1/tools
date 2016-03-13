@@ -2046,6 +2046,24 @@
     };
   }
   
+  //// Sorting ////
+  
+  function insort(f, x, a){
+    for (var i = 0; i < a.length; i++){
+      if (!f(a[i], x)){
+        ins(a, i, x);
+        return;
+      }
+    }
+    push(x, a);
+  }
+  
+  function insortasc(x, a){
+    insort(function (a, b){
+      return a < b;
+    }, x, a);
+  }
+  
   //// Reference ////
   
   function self(a){
@@ -2741,6 +2759,9 @@
     man1: man1,
     man2: man2,
     everyn: everyn,
+    
+    insort: insort,
+    insortasc: insortasc,
     
     self: self,
     

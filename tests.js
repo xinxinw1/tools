@@ -78,3 +78,49 @@ QUnit.test("everyn", function (assert){
   v.check();
   assert.same(a, 3);
 });
+
+QUnit.test("insort", function (assert){
+  var a, f;
+  
+  a = [];
+  f = function (a, b){
+    return a.length > b.length;
+  };
+  
+  $.insort(f, "test", a);
+  assert.same(a, ["test"], $.iso);
+  $.insort(f, "abcd", a);
+  assert.same(a, ["abcd", "test"], $.iso);
+  $.insort(f, "a", a);
+  assert.same(a, ["abcd", "test", "a"], $.iso);
+  $.insort(f, "wefef", a);
+  assert.same(a, ["wefef", "abcd", "test", "a"], $.iso);
+  
+  a = [];
+  f = function (a, b){
+    return a.length >= b.length;
+  };
+  
+  $.insort(f, "test", a);
+  assert.same(a, ["test"], $.iso);
+  $.insort(f, "abcd", a);
+  assert.same(a, ["test", "abcd"], $.iso);
+  $.insort(f, "a", a);
+  assert.same(a, ["test", "abcd", "a"], $.iso);
+  $.insort(f, "wefef", a);
+  assert.same(a, ["wefef", "test", "abcd", "a"], $.iso);
+  
+  a = [];
+  $.insortasc(3, a);
+  assert.same(a, [3], $.iso);
+  $.insortasc(2, a);
+  assert.same(a, [2, 3], $.iso);
+  $.insortasc(3, a);
+  assert.same(a, [2, 3, 3], $.iso);
+  $.insortasc(5, a);
+  assert.same(a, [2, 3, 3, 5], $.iso);
+  $.insortasc(1, a);
+  assert.same(a, [1, 2, 3, 3, 5], $.iso);
+  
+});
+
