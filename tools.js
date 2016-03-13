@@ -1916,6 +1916,12 @@
     return dsp(a);
   }
   
+  ////// Number //////
+  
+  function max(){
+    return best(function (a, b){return a > b;}, arguments);
+  }
+  
   ////// Function //////
   
   function call(a){
@@ -2675,6 +2681,8 @@
     low: low,
     upp: upp,
     stf: stf,
+    
+    max: max,
     
     call: call,
     orig: orig,
