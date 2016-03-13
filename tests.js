@@ -67,6 +67,15 @@ QUnit.test("everyn", function (assert){
   assert.same(a, 3);
   v.check();
   assert.same(a, 4);
+  v.check();
+  assert.same(a, 4);
+  v.setn(2);
+  v.check();
+  assert.same(a, 5);
+  v.check();
+  assert.same(a, 5);
+  v.check();
+  assert.same(a, 6);
   
   var a = 1;
   

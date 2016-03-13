@@ -1953,8 +1953,8 @@
     var n = 0;
     
     function add(a){
-      if (udfp(avg))avg = a;
-      avg = n/(n+1)*avg + a/(n+1);
+      if (avg === null)avg = a;
+      else avg = n/(n+1)*avg + a/(n+1);
       n++;
     }
     
@@ -2085,12 +2085,17 @@
       }
     }
     
+    function setn(n2){
+      n = n2;
+    }
+    
     function reset(){
       curr = 1;
     }
     
     return {
       check: check,
+      setn: setn,
       reset: reset
     };
   }
@@ -2339,6 +2344,9 @@
   ////// Time //////
   
   function currtim(){
+    if (typeof performance != 'undefined'){
+      return performance.now();
+    }
     return (new Date()).getTime();
   }
   
