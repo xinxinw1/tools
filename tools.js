@@ -1927,7 +1927,7 @@
   }
   
   function avgcol(){
-    var avg;
+    var avg = null;
     var n = 0;
     
     function add(a){
@@ -1936,18 +1936,18 @@
       n++;
     }
     
-    function getavg(){
+    function get(){
       return avg;
     }
     
     function reset(){
-      avg = udf;
+      avg = null;
       n = 0;
     }
     
     return {
       add: add,
-      getavg: getavg,
+      get: get,
       reset: reset
     };
   }
