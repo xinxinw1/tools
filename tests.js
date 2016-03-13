@@ -34,3 +34,47 @@ QUnit.test("avgcol", function (assert){
   c.add(3);
   assert.same(c.getavg(), 4);
 });
+
+QUnit.test("everyn", function (assert){
+  var a = 1;
+  
+  var f = function (){
+    a++;
+  };
+  
+  var v = $.everyn(3, f);
+  
+  assert.same(a, 1);
+  v.check();
+  assert.same(a, 1);
+  v.check();
+  assert.same(a, 1);
+  v.check();
+  assert.same(a, 2);
+  v.check();
+  assert.same(a, 2);
+  v.check();
+  assert.same(a, 2);
+  v.check();
+  assert.same(a, 3);
+  v.check();
+  assert.same(a, 3);
+  v.reset();
+  assert.same(a, 3);
+  v.check();
+  assert.same(a, 3);
+  v.check();
+  assert.same(a, 3);
+  v.check();
+  assert.same(a, 4);
+  
+  var a = 1;
+  
+  var v = $.everyn(0, f);
+  
+  assert.same(a, 1);
+  v.check();
+  assert.same(a, 2);
+  v.check();
+  assert.same(a, 3);
+});
