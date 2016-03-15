@@ -2073,7 +2073,7 @@
     };
   }
   
-  function everyn(n, f){
+  function everyn(f, n){
     var curr = 1;
     
     function check(){

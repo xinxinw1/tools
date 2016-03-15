@@ -42,7 +42,7 @@ QUnit.test("everyn", function (assert){
     a++;
   };
   
-  var v = $.everyn(3, f);
+  var v = $.everyn(f, 3);
   
   assert.same(a, 1);
   v.check();
@@ -79,7 +79,7 @@ QUnit.test("everyn", function (assert){
   
   var a = 1;
   
-  var v = $.everyn(0, f);
+  var v = $.everyn(f, 0);
   
   assert.same(a, 1);
   v.check();
