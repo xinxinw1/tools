@@ -1,20 +1,16 @@
 /***** Tools *****/
 
 (function (udf){
-  var nodep = typeof window === "undefined";
+  var webp = typeof window !== "undefined";
+  var nodep = typeof module !== "undefined";
   
   if (!nodep){
     var win = window;
     var doc = win.document;
-    var Node = win.Node;
-    var Window = win.Window;
-    var fs = {};
+    var glob = win;
   } else {
-    var win = {};
-    var doc = {};
-    var Node = function (){};
-    var Window = function (){};
     var fs = require('fs');
+    var glob = global;
   }
   
   var inf = Infinity;
@@ -83,7 +79,7 @@
   }
   
   function htmp(a){
-    return a instanceof Node;
+    return webp && a instanceof Node;
   }
   
   function docp(a){
@@ -91,7 +87,7 @@
   }
   
   function winp(a){
-    return a instanceof Window;
+    return webp && a instanceof Window;
   }
   
   function txtp(a){
@@ -2556,8 +2552,8 @@
   
   // global eval
   function evl(a){
-    return (win.execScript || function (a){
-      return win["eval"].call(win, a);
+    return (glob.execScript || function (a){
+      return glob["eval"].call(glob, a);
     })(a);
   }
   
@@ -2570,10 +2566,12 @@
   ////// Object exposure //////
   
   att($, {
+    webp: webp,
     nodep: nodep,
     udf: udf,
-    win: win,
-    doc: doc,
+    win: webp?win:{},
+    doc: webp?doc:{},
+    glob: glob,
     inf: inf,
     
     cls: cls,
@@ -2889,10 +2887,14 @@
     change: change
   });
   
-  var old$ = win.$;
+  if (webp){
+    var old$ = win.$;
+    win.$ = $;
+  }
   
-  if (nodep)module.exports = $;
-  else win.$ = $;
+  if (nodep){
+    module.exports = $;
+  }
   
   ////// Testing //////
   
