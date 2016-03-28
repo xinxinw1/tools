@@ -1,8 +1,8 @@
 /***** Tools *****/
 
 (function (udf){
-  var webp = typeof window !== "undefined";
-  var nodep = typeof module !== "undefined";
+  var nodep = typeof process !== "undefined" && cls(process) === '[object process]';
+  var webp = !nodep;
   
   if (!nodep){
     var win = window;
