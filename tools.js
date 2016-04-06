@@ -1795,6 +1795,16 @@
     });
   }
   
+  function loop(a, b, f){
+    for (var i = a; i < b; i++){
+      f(i);
+    }
+  }
+  
+  function repeat(n, f){
+    loop(0, n, function (i){f()});
+  }
+  
   ////// Object and alist //////
   
   function keys(a){
@@ -2806,6 +2816,9 @@
     att: att,
     det1: det1,
     det: det,
+    
+    loop: loop,
+    repeat: repeat,
     
     keys: keys,
     vals: vals,
