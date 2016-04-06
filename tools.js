@@ -2034,6 +2034,41 @@
     };
   }
   
+  function avgcoln(max){
+    var arr = [];
+    var avg = null;
+    var n = 0;
+    
+    function add(a){
+      if (n < max){
+        if (avg === null)avg = a;
+        else avg = n/(n+1)*avg + a/(n+1);
+        n++;
+      } else {
+        var last = arr.shift();
+        avg += (a-last)/n;
+      }
+      arr.push(a);
+    }
+    
+    function get(){
+      return avg;
+    }
+    
+    function reset(){
+      avg = null;
+      n = 0;
+      arr = [];
+    }
+    
+    return {
+      add: add,
+      get: get,
+      reset: reset,
+      arr: arr
+    };
+  }
+  
   ////// Function //////
   
   function call(a){
@@ -2850,6 +2885,7 @@
     max: max,
     avgcol: avgcol,
     medcol: medcol,
+    avgcoln: avgcoln,
     
     call: call,
     orig: orig,
