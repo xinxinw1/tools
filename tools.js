@@ -129,6 +129,17 @@
     return iso(a, b, deepiso);
   }
   
+  function leveliso(a, b, n){
+    if (n === 0)return is(a, b);
+    return iso(a, b, levelison(n-1));
+  }
+  
+  function levelison(n){
+    return function (a, b){
+      return leveliso(a, b, n);
+    };
+  }
+  
   function isoArr(a, b, f){
     if (udfp(f))f = is;
     if (len(a) != len(b))return false;
@@ -2600,6 +2611,8 @@
     isn: isn,
     iso: iso,
     deepiso: deepiso,
+    leveliso: leveliso,
+    levelison: levelison,
     isoArr: isoArr,
     isoObj: isoObj,
     isoRgx: isoRgx,

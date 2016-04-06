@@ -2,13 +2,18 @@ var udf = $.udf;
 
 QUnit.assert.same = function (act, exp, cfn){
   if ($.udfp(cfn))cfn = $.is;
-  this.push(cfn(act, exp), act, exp);
+  this.pushResult({
+    result: cfn(act, exp),
+    actual: act,
+    expected: exp,
+    message: $.udf
+  });
 };
 
 QUnit.assert.diff = function (act, notexp, cfn){
-  if ($.udfp(cfn))cfn = $.isn;
+  if ($.udfp(cfn))cfn = $.is;
   this.pushResult({
-    result: cfn(act, notexp),
+    result: !cfn(act, notexp),
     actual: act,
     expected: notexp,
     message: $.udf,

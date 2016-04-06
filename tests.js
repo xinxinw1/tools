@@ -1,4 +1,27 @@
 
+QUnit.test('leveliso', function (assert){
+  var a = [1, 2, 3];
+  var b = [1, 2, 3];
+  assert.false($.leveliso(a, b, 0));
+  assert.true($.leveliso(a, b, 1));
+  assert.true($.leveliso(a, b, 2));
+  
+  var a = [[1], [2], [3]];
+  var b = [[1], [2], [3]];
+  assert.false($.leveliso(a, b, 0));
+  assert.false($.leveliso(a, b, 1));
+  assert.true($.leveliso(a, b, 2));
+  assert.true($.leveliso(a, b, 3));
+  
+  var a = [[[1]], [[2]], [[2]]];
+  var b = [[[1]], [[2]], [[2]]];
+  assert.false($.leveliso(a, b, 0));
+  assert.false($.leveliso(a, b, 1));
+  assert.false($.leveliso(a, b, 2));
+  assert.true($.leveliso(a, b, 3));
+  assert.true($.leveliso(a, b, 4));
+});
+
 QUnit.test("best", function (assert){
   var f1 = function (a, b){return a.length > b.length;};
   var f2 = function (a, b){return a.length < b.length;};
