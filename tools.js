@@ -284,8 +284,8 @@
     return a[x];
   }
   
-  // detach
-  function det(a, x){
+  // untag
+  function utag(a, x){
     var r = a[x];
     delete a[x];
     return r;
@@ -439,8 +439,8 @@
         var x = car(a);
         if (nilp(cdr(a))){
           tag(a, "type", "nil");
-          det(a, "car");
-          det(a, "cdr");
+          utag(a, "car");
+          utag(a, "cdr");
         } else {
           scar(a, cadr(a));
           scdr(a, cddr(a));
@@ -1779,6 +1779,22 @@
     });
   }
   
+  function det1(a, x){
+    if (htmp(a)){
+      man1(function (x){
+        a.removeChild(x);
+      })(x);
+      return;
+    }
+    err(det1, "Can't detach x = $1 from a = $2", x, a);
+  }
+  
+  function det(a){
+    each(sli(arguments, 1), function (x){
+      det1(a, x);
+    });
+  }
+  
   ////// Object and alist //////
   
   function keys(a){
@@ -2631,7 +2647,7 @@
     typ: typ,
     tag: tag,
     rep: rep,
-    det: det,
+    utag: utag,
     dat: dat,
     sdat: sdat,
     
@@ -2788,6 +2804,8 @@
     
     att1: att1,
     att: att,
+    det1: det1,
+    det: det,
     
     keys: keys,
     vals: vals,
