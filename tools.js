@@ -1981,6 +1981,10 @@
     return best(gt, arguments);
   }
   
+  function min(){
+    return best(lt, arguments);
+  }
+  
   function avgcol(){
     var avg = null;
     var n = 0;
@@ -2883,6 +2887,7 @@
     ge: ge,
     compare: compare,
     max: max,
+    min: min,
     avgcol: avgcol,
     medcol: medcol,
     avgcoln: avgcoln,
