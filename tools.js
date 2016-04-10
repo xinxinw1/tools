@@ -262,7 +262,7 @@
   
   function dspTag(a, dsp, dspSta){
     var f = dspfns[a.type];
-    if (udfp(f))return dspObj(a, dsp, dspSta);
+    if (udfp(f))return dspSimp1(a, dsp, dspSta);
     return f(a, dsp, dspSta);
   }
   
@@ -468,7 +468,7 @@
   function hasLisFn(x, a){
     if (nilp(a))return false;
     if (x(car(a)))return a;
-    return hasLis(x, cdr(a));
+    return hasLisFn(x, cdr(a));
   }
   
   //// Predicates ////
@@ -2233,7 +2233,7 @@
   function atrs(a){
     var o = {};
     each(a.attributes, function (x){
-      if (x.specified)o[x.name] = x.valsue;
+      if (x.specified)o[x.name] = x.value;
     });
     each(keys(a), function (x){
       if (beg(x, "on") && !nulp(a[x]))o[x] = a[x];
