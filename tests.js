@@ -1,4 +1,32 @@
 
+QUnit.test('Predicates', function (A){
+  A.true($.nump(1));
+  A.false($.nump("0"));
+  
+  A.true($.strp("hey"));
+  A.false($.strp(0));
+  
+  A.true($.arrp([]));
+  A.false($.arrp(0));
+  
+  A.true($.arrp_([]));
+  
+  A.false($.irrp([]));
+  
+  A.true($.fnp(function (){}));
+  A.false($.fnp([]));
+  
+});
+
+QUnit.test('Comparison', function (A){
+  A.true($.is(0, 0));
+  A.false($.is([], []));
+  
+  A.true($.isn(0, 1));
+  
+});
+
+
 QUnit.test('leveliso', function (assert){
   var a = [1, 2, 3];
   var b = [1, 2, 3];
