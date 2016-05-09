@@ -1,22 +1,30 @@
 var udf = $.udf;
 
-QUnit.assert.same = function (act, exp, cfn){
+QUnit.assert.same = function (act, exp, messcfn, mess){
+  var cfn = $.udf;
+  if ($.fnp(messcfn))cfn = messcfn;
+  else mess = messcfn;
   if ($.udfp(cfn))cfn = $.is;
+  if ($.udfp(mess))mess = "comparing " + $.dspSimp(act) + " with " + $.dspSimp(exp) + " using " + $.dspSimp(cfn);
   this.pushResult({
     result: cfn(act, exp),
     actual: act,
     expected: exp,
-    message: $.udf
+    message: mess
   });
 };
 
-QUnit.assert.diff = function (act, notexp, cfn){
+QUnit.assert.diff = function (act, notexp, messcfn, mess){
+  var cfn = $.udf;
+  if ($.fnp(messcfn))cfn = messcfn;
+  else mess = messcfn;
   if ($.udfp(cfn))cfn = $.is;
+  if ($.udfp(mess))mess = "diffing comparing " + $.dspSimp(act) + " with " + $.dspSimp(exp) + " using " + $.dspSimp(cfn);
   this.pushResult({
     result: !cfn(act, notexp),
     actual: act,
     expected: notexp,
-    message: $.udf,
+    message: mess,
     negative: true
   });
 };
@@ -70,3 +78,7 @@ QUnit.assert.allsame = function (arr, cfn){
 QUnit.assert.alldiff = function (arr, cfn){
   this.diffwpre($.self, arr, cfn);
 }
+
+QUnit.assert.testspd = function (fn, s){
+  this.same($.tim1(fn), s, $.le, 'testing speed less than or equal to ' + s);
+};
