@@ -1,0 +1,11 @@
+{
+  "name": "tools",
+  "version": "0.0.1",
+  "description": "Xin-Xin's Javascript Tools",
+  "license": "GPL-2.0",
+  "repository": "xinxinw1/tools",
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-qunit": "^1.2.0"
+  }
+}
