@@ -139,6 +139,29 @@ QUnit.test("everyn", function (assert){
   assert.same(a, 3);
 });
 
+QUnit.test("mem", function (assert){
+  var called = false;
+  
+  function func(a){
+    called = true;
+    return a + 2;
+  }
+  
+  var mfunc = $.mem(func);
+  
+  called = false;
+  assert.same(mfunc(3), 5);
+  assert.true(called);
+  
+  called = false;
+  assert.same(mfunc(3), 5);
+  assert.false(called);
+  
+  called = false;
+  assert.same(mfunc(4), 6);
+  assert.true(called);
+});
+
 QUnit.test("insort", function (assert){
   var a, f;
   

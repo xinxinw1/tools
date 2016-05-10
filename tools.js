@@ -2172,6 +2172,19 @@
     };
   }
   
+  //// Memoization ////
+  
+  function mem(f){
+    var m = {};
+    
+    function get(a){
+      if (!udfp(m[a]))return m[a];
+      return m[a] = f(a);
+    }
+    
+    return get;
+  }
+  
   //// Sorting ////
   
   function insort(f, x, a){
@@ -2903,6 +2916,8 @@
     man1: man1,
     man2: man2,
     everyn: everyn,
+    
+    mem: mem,
     
     insort: insort,
     insortasc: insortasc,
