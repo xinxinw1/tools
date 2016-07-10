@@ -29,12 +29,12 @@ QUnit.assert.diff = function (act, notexp, messcfn, mess){
   });
 };
 
-QUnit.assert.true = function (a){
-  this.same(a, true);
+QUnit.assert.true = function (a, m){
+  this.same(a, true, m);
 }
 
-QUnit.assert.false = function (a){
-  this.same(a, false);
+QUnit.assert.false = function (a, m){
+  this.same(a, false, m);
 }
 
 QUnit.assert.type = function (a, t, m){

@@ -2081,6 +2081,130 @@
     };
   }
   
+  function numBits(n){
+    var i = 0;
+    for (i = 0; n !== 0; i++){
+      if (n % 2 == 0){
+        n = n/2;
+      } else {
+        n = (n-1)/2;
+      }
+    }
+    return i;
+  }
+  
+  ////// Random //////
+  
+  function crandBitGen(){
+    var maxBytes = 65536;
+    var arrayBits = 16;
+    var bitsPerByte = 8;
+    
+    var length = maxBytes/(arrayBits/bitsPerByte);
+    var randArr = new Uint16Array(length);
+    var randNum = 0;
+    var bitsRemaining = 0;
+    var i = length-1;
+    
+    function repopulate(){
+      window.crypto.getRandomValues(randArr);
+      i = -1;
+      next();
+    }
+    
+    function next(){
+      i++;
+      if (i == length){
+        repopulate();
+      } else {
+        bitsRemaining = arrayBits;
+        randNum = randArr[i];
+      }
+    }
+    
+    function get(){
+      if (bitsRemaining == 0)next();
+      //out(randNum);
+      var bit = randNum & 1;
+      randNum = randNum >>> 1;
+      bitsRemaining--;
+      return bit;
+    }
+    
+    return {
+      get: get
+    };
+  }
+  
+  var crandBitGenerator = crandBitGen();
+  
+  // result is 0 or 1
+  function crandBit(){
+    return crandBitGenerator.get();
+  }
+  
+  // result is int in [0, 2^pow)
+  function crandPowTwo(pow){
+    var n = 0;
+    for (var i = pow-1; i >= 0; i--){
+      n = n*2 + crandBit();
+    }
+    return n;
+  }
+  
+  // result is int in [0, max)
+  function crandUpTo(max){
+    var b = numBits(max);
+    var n;
+    do {
+      n = crandPowTwo(b);
+    } while (n >= max);
+    return n;
+  }
+  
+  // result is int in [min, max)
+  function crandNoEnd(min, max){
+    return min + crandUpTo(max-min);
+  }
+  
+  // result is int in [min, max]
+  function crand(min, max){
+    return crandNoEnd(min, max+1);
+  }
+  
+  // Math.random() gives float in [0, 1)
+  // result is int in [0, max)
+  function mrandUpTo(max){
+    return Math.floor(Math.random()*max);
+  }
+  
+  // result is 0 or 1
+  function mrandBit(){
+    return mrandUpTo(2);
+  }
+  
+  // result is int in [min, max)
+  function mrandNoEnd(min, max){
+    return min + mrandUpTo(max-min);
+  }
+  
+  // result is int in [min, max]
+  function mrand(min, max){
+    return mrandNoEnd(min, max+1);
+  }
+  
+  // result is int in [min, max]
+  function rand(min, max){
+    if (window.crypto)return crand(min, max);
+    return mrand(min, max);
+  }
+  
+  // result is 0 or 1
+  function randBit(){
+    if (window.crypto)return crandBit();
+    return mrandBit();
+  }
+  
   ////// Function //////
   
   function call(a){
@@ -2646,10 +2770,6 @@
   
   ////// Other //////
   
-  function rand(mn, mx){
-    return Math.floor(Math.random()*(mx-mn+1))+mn;
-  }
-  
   function do1(){
     return arguments[0];
   }
@@ -2923,6 +3043,14 @@
     avgcol: avgcol,
     medcol: medcol,
     avgcoln: avgcoln,
+    numBits: numBits,
+    
+    crandBit: crandBit,
+    crand: crand,
+    mrand: mrand,
+    mrandBit: mrandBit,
+    rand: rand,
+    randBit: randBit,
     
     call: call,
     orig: orig,
@@ -3001,7 +3129,6 @@
     err: err,
     errData: errData,
     
-    rand: rand,
     do1: do1,
     exit: exit,
     evl: evl,

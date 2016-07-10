@@ -225,3 +225,76 @@ QUnit.test("medcol", function (assert){
   
 });
 
+QUnit.test("numBits", function (assert){
+  assert.same($.numBits(0), 0);
+  assert.same($.numBits(1), 1);
+  assert.same($.numBits(2), 2);
+  assert.same($.numBits(3), 2);
+  assert.same($.numBits(4), 3);
+  assert.same($.numBits(5), 3);
+  assert.same($.numBits(6), 3);
+  assert.same($.numBits(7), 3);
+  assert.same($.numBits(8), 4);
+  assert.same($.numBits(4294967295), 32);
+});
+
+function genRandHash(total, randfn){
+  var arr = {};
+  for (var i = 1; i <= total; i++){
+    var num = randfn();
+    if (arr[num] === undefined)arr[num] = 1;
+    else arr[num]++;
+  }
+  return arr;
+}
+
+QUnit.assert.testWithin = function (a, x, maxerr, mess){
+  var err = Math.abs((a-x)/x*100);
+  this.true(err <= maxerr, mess + ": " + err + " < " + maxerr);
+}
+
+QUnit.assert.testRangeWithin = function (obj, x, maxerr){
+  for (var i in obj){
+    this.testWithin(obj[i], x, maxerr, "check percentErr for " + i);
+  }
+}
+
+QUnit.assert.testRandHash = function (values, entries, maxerr, fn){
+  if (fn === undefined)fn = $.randBit;
+  var expectedEntriesInEach = entries/values;
+  var obj = genRandHash(entries, fn);
+  this.testRangeWithin(obj, expectedEntriesInEach, maxerr);
+}
+
+QUnit.assert.testRandHashRange = function (start, end, numentries, maxerr, randfn){
+  if (randfn === undefined)randfn = $.rand;
+  this.testRandHash(end-start+1, numentries, maxerr, function (){
+    return randfn(start, end);
+  });
+}
+
+QUnit.test("crandBit", function (assert){
+  assert.testRandHash(2, 100000, 1, $.crandBit);
+});
+
+QUnit.test("mrandBit", function (assert){
+  assert.testRandHash(2, 100000, 1, $.mrandBit);
+});
+
+QUnit.test("mrand", function (assert){
+  assert.testRandHashRange(0, 1, 100000, 1, $.mrand);
+  assert.testRandHashRange(1, 100, 1000000, 5, $.mrand);
+  assert.testRandHashRange(1, 1000, 1000000, 13, $.mrand);
+  assert.testRandHashRange(1000000, 1000100, 1000000, 5, $.mrand);
+});
+
+QUnit.test("crand", function (assert){
+  assert.testRandHashRange(0, 1, 100000, 1, $.crand);
+  assert.testRandHashRange(1, 100, 1000000, 5, $.crand);
+  assert.testRandHashRange(1, 1000, 1000000, 13, $.crand);
+  assert.testRandHashRange(1000000, 1000100, 1000000, 5, $.crand);
+});
+
+QUnit.test("rand", function (assert){
+  assert.testRandHashRange(0, 1, 100000, 1, $.rand);
+});
