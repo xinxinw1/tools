@@ -2193,6 +2193,17 @@
     return get;
   }
   
+  //// Range ////
+  
+  // build array of ints from a to b
+  function range(a, b){
+    var r = [];
+    for (var i = a; i <= b; i++){
+      r.push(i);
+    }
+    return r;
+  }
+  
   //// Sorting ////
   
   function insort(f, x, a){
@@ -2926,6 +2937,8 @@
     everyn: everyn,
     
     mem: mem,
+    
+    range: range,
     
     insort: insort,
     insortasc: insortasc,
