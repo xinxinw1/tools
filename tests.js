@@ -247,19 +247,19 @@ QUnit.test("mrandBit", function (assert){
 });
 
 QUnit.test("mrand", function (assert){
-  assert.testRandHashRange(0, 1, 100000, 1, $.mrand);
-  assert.testRandHashRange(1, 100, 1000000, 5, $.mrand);
-  assert.testRandHashRange(1, 1000, 1000000, 13, $.mrand);
-  assert.testRandHashRange(1000000, 1000100, 1000000, 5, $.mrand);
+  assert.testRandHashRange(0, 1, 10000, 5, $.mrand);
+  assert.testRandHashRange(1, 100, 100000, 15, $.mrand);
+  assert.testRandHashRange(1, 1000, 100000, 50, $.mrand);
+  assert.testRandHashRange(1000000, 1000100, 100000, 15, $.mrand);
 });
 
 QUnit.test("crand", function (assert){
-  assert.testRandHashRange(0, 1, 100000, 1, $.crand);
-  assert.testRandHashRange(1, 100, 1000000, 5, $.crand);
-  assert.testRandHashRange(1, 1000, 1000000, 13, $.crand);
-  assert.testRandHashRange(1000000, 1000100, 1000000, 5, $.crand);
+  assert.testRandHashRange(0, 1, 10000, 5, $.crand);
+  assert.testRandHashRange(1, 100, 100000, 15, $.crand);
+  assert.testRandHashRange(1, 1000, 100000, 50, $.crand);
+  assert.testRandHashRange(1000000, 1000100, 100000, 15, $.crand);
 });
 
 QUnit.test("rand", function (assert){
-  assert.testRandHashRange(0, 1, 100000, 1, $.rand);
+  assert.testRandHashRange(0, 1, 10000, 5, $.rand);
 });
