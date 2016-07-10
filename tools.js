@@ -2152,45 +2152,35 @@
     return n;
   }
   
-  // result is int in [0, max)
+  // result is int in [0, max]
   function crandUpTo(max){
     var b = numBits(max);
     var n;
     do {
       n = crandPowTwo(b);
-    } while (n >= max);
+    } while (n > max);
     return n;
-  }
-  
-  // result is int in [min, max)
-  function crandNoEnd(min, max){
-    return min + crandUpTo(max-min);
   }
   
   // result is int in [min, max]
   function crand(min, max){
-    return crandNoEnd(min, max+1);
+    return min + crandUpTo(max-min);
   }
   
   // Math.random() gives float in [0, 1)
-  // result is int in [0, max)
+  // result is int in [0, max]
   function mrandUpTo(max){
-    return Math.floor(Math.random()*max);
+    return Math.floor(Math.random()*(max+1));
   }
   
   // result is 0 or 1
   function mrandBit(){
-    return mrandUpTo(2);
-  }
-  
-  // result is int in [min, max)
-  function mrandNoEnd(min, max){
-    return min + mrandUpTo(max-min);
+    return mrandUpTo(1);
   }
   
   // result is int in [min, max]
   function mrand(min, max){
-    return mrandNoEnd(min, max+1);
+    return min + mrandUpTo(max-min);
   }
   
   // result is int in [min, max]

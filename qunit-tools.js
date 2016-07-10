@@ -82,3 +82,39 @@ QUnit.assert.alldiff = function (arr, cfn){
 QUnit.assert.testspd = function (fn, s){
   this.same($.tim1(fn), s, $.le, 'testing speed less than or equal to ' + s);
 };
+
+function genRandHash(total, randfn){
+  var arr = {};
+  for (var i = 1; i <= total; i++){
+    var num = randfn();
+    if (arr[num] === undefined)arr[num] = 1;
+    else arr[num]++;
+  }
+  return arr;
+}
+
+QUnit.assert.testWithin = function (a, x, maxerr, mess){
+  var err = Math.abs((a-x)/x*100);
+  this.true(err <= maxerr, mess + ": " + err + " < " + maxerr);
+}
+
+QUnit.assert.testRangeWithin = function (obj, x, maxerr){
+  for (var i in obj){
+    this.testWithin(obj[i], x, maxerr, "check percentErr for " + i);
+  }
+}
+
+QUnit.assert.testRandHash = function (values, entries, maxerr, fn){
+  if (fn === undefined)fn = $.randBit;
+  var expectedEntriesInEach = entries/values;
+  var obj = genRandHash(entries, fn);
+  this.testRangeWithin(obj, expectedEntriesInEach, maxerr);
+  $.out(obj);
+}
+
+QUnit.assert.testRandHashRange = function (start, end, numentries, maxerr, randfn){
+  if (randfn === undefined)randfn = $.rand;
+  this.testRandHash(end-start+1, numentries, maxerr, function (){
+    return randfn(start, end);
+  });
+}
