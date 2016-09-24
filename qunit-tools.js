@@ -29,6 +29,10 @@ QUnit.assert.diff = function (act, notexp, messcfn, mess){
   });
 };
 
+QUnit.assert.iso = function (act, exp, mess){
+  this.same(act, exp, $.iso, mess);
+}
+
 QUnit.assert.true = function (a, m){
   this.same(a, true, m);
 }
