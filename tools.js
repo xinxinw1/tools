@@ -137,6 +137,8 @@
     return iso(a, b, deepiso);
   }
   
+  // n = 0: is(a, b)
+  // n = 1: iso(a, b)
   function leveliso(a, b, n){
     if (n === 0)return is(a, b);
     return iso(a, b, levelison(n-1));
@@ -1198,7 +1200,7 @@
   function cpyArr(a){
     var r = [];
     for (var i = 0; i < a.length; i++){
-      r[i] = a[i];
+      r.push(a[i]);
     }
     return r;
   }
@@ -1219,14 +1221,16 @@
   
   function rev(a){
     if (arrp(a))return (irrp(a)?cpy(a):a).reverse();
-    if (strp(a)){
-      var s = "";
-      for (var i = len(a)-1; i >= 0; i--){
-        s += a[i];
-      }
-      return s;
-    }
+    if (strp(a))return revStr(a);
     err(rev, "Can't reverse a = $1", a);
+  }
+  
+  function revStr(a){
+    var s = "";
+    for (var i = a.length-1; i >= 0; i--){
+      s += a[i];
+    }
+    return s;
   }
   
   //// Parts ////
@@ -2939,6 +2943,7 @@
     cpyObj: cpyObj,
     cln: cln,
     rev: rev,
+    revStr: revStr,
     
     sli: sli,
     sliStr: sliStr,

@@ -33,6 +33,10 @@ QUnit.assert.iso = function (act, exp, mess){
   this.same(act, exp, $.iso, mess);
 }
 
+QUnit.assert.leveliso = function (act, exp, n, mess){
+  this.same(act, exp, $.levelison(n), mess);
+}
+
 QUnit.assert.true = function (a, m){
   this.same(a, true, m);
 }
